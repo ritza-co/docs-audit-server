@@ -1,0 +1,12 @@
+<html>
+  <body>
+    <h1>View Audit Results</h1>
+    <a href="{{ url_for('home') }}">Home</a>
+    <p>Enter a URL below to see the site's audit results</p>
+    <form action="/search" method="POST">
+      <p>URL <input type = "text" name = "Url" /></p>
+      <div class="input submit">
+                    <input type="submit" value="Submit"></div>
+    </form>
+  </body>
+</html>

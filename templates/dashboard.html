@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+    <head>
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table,
+      th,
+      td {
+        padding: 10px;
+        border: 1px solid black;
+        border-collapse: collapse;
+      }
+      .url_value {
+        display: none;
+      }
+
+th, td {
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {background-color: #f2f2f2;}
+</style>
+    <script src="{{ url_for('static', filename='sorttable.js') }}"></script>
+    </head>
+
+    <body>
+        {% if message %}
+        <p style="color: red;">{{message}}</p>
+        {%endif %}
+        <h1>Tasks</h1>
+
+        <h2>Submit new task(s)</h2>
+        <p>Please note each url must be on a new line</p>
+
+        <form method="POST" action="/task">
+            <textarea type = "text" name = "input_data" rows="5" cols="50vw" placeholder="input data"></textarea>
+            <p></p>
+            <div class="input submit">
+              <input type="submit" value="Submit"/>
+            </div>
+        </form>
+
+        <p></p>
+        <p></p>
+
+        <table>
+            <tr>
+                <th>Task ID</th>
+                <th>Task Type</th>
+                <th>Input Data</th>
+                <th>Status</th>
+                <th>Created at</th>
+                <th>Assigned at</ht>
+            </tr>
+
+            {% for task in tasks %}
+            <tr>
+                <td><a href="./result?task_id={{task.task_id}}">{{task.task_id}}</a></td>
+                <td>{{task.task_type}}</td>
+                <td>{{task.input_data}}</td>
+                <td>{{task.status}}</td>
+                <td>{{task.created_at}}</td>
+                <td>{{task.assigned_at}}
+            </tr>
+            {% endfor %}
+        </table>
+
+        <p></p>
+        <p></p>
+
+        <table class="sortable" id="dynamic_table">
+            <thead><tr>
+                <th>Docs</th>
+                <th>Urls Audited</th>
+                <th>Images</th>
+                <th>Links</th>
+                <th>Image Issues</th>
+                <th>Link Issues</th>
+            </tr></thead>
+            <tbody>
+            {% for docs in projects %}
+            <tr>
+            <td><a href="./project_details?docs_base_url={{docs}}">{{docs}}</a></td>
+            <td>{{projects[docs]['count']}}</td>
+            <td>{{projects[docs]['images']}}</td>
+            <td>{{projects[docs]['links']}}</td>
+            <td>{{projects[docs]['oversized_images']|length}}</td>
+            <td>{{projects[docs]['broken_links']}}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    </head>
+
+    
+
+    <body>
+        <h1>Task results</h1>
+
+        <p><b>Task</b> {{task.task_id}} <b>completed on</b> {{task.completed_at}} <b>by</b> {{result.worker_id}}</p>
+
+        <p><b>Output</b>
+
+        <pre>
+            {% for item in result.output %}
+                {{item}}
+            {% endfor %}
+        </pre>
+        
+        </p>
+
+        
+    
+    </body>
+</html>

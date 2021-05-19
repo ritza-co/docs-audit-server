@@ -1,0 +1,12 @@
+<html>
+  <body>
+    <h1>View Collection Audit Results</h1>
+    <a href="{{ url_for('home') }}">Home</a>
+    <p>Enter the Base URL below to see the site's collection of audit results</p>
+    <form action="/results-collection" method="POST">
+      <p>URL <input type = "text" name = "Url" /></p>
+      <div class="input submit">
+                    <input type="submit" value="Submit"></div>
+    </form>
+  </body>
+</html>

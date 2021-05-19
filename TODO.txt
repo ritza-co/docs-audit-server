@@ -1,0 +1,10 @@
+# TODO
+
+* Move the front-ends from docs-audit to docs-server
+* Move the input logic from docs-audit to docs-server (user can submit URLs)
+* Write logic to create a 2 tasks for each URL the user submits (a link audit taks and an image audit task)
+* Separate the tasks in the worker so only does the specific task
+* Write logic in the server to understadn the output from the worker so it can idsplay these results to the user
+* Create a loop in the worker to pull a new taks the moment it has submitted the results of the previous one - Sleep for 60 seconds if there are no tasks avialable and ask for another one then.
+
+
