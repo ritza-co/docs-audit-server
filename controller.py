@@ -1,5 +1,4 @@
 import task_manager
-from replit import db
 
 def separate_urls(form_input):
     urls_list = form_input.split("\r\n")
@@ -19,9 +18,8 @@ def create_result_dict(task_results):
 
 def get_result_for_url(url):
     url_task_results = []
-    for result in db['results']:
-      print(result['task_url'].split("//"))
-      print(url)
+    results = task_manager.get_results()
+    for result in results:
       if result['task_url'].split("//")[1] == url:
         url_task_results.append(result)
     audit_results = create_result_dict(url_task_results)
@@ -41,6 +39,11 @@ def remove_id_ref_from_url(urls_list):
       no_slash_url = remove_trailing_slash(no_ref_url[0])
       urls_list_with_no_ref.append(no_slash_url)
     return urls_list_with_no_ref
+
+def remove_id_ref_and_trailing_slash(url):
+    no_ref_url = url.split('#')[0]
+    clean_url = remove_trailing_slash(no_ref_url)
+    return clean_url
 
 def calculate_project_sums(current_project_count, task_results):
     if task_results['task_type'] == 'image_audit':

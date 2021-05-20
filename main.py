@@ -92,16 +92,7 @@ def recrawl():
         print(form_data)
         if not form_data.startswith("http"):
             form_data = "https://" + form_data
-        return redirect("/dashboard")
-
-@app.route('/results-collection', methods = ['POST', 'GET'])
-def collection():
-    if request.method == 'GET':
-        return f"Use the '/' url to submit form"
-    if request.method == 'POST':
-        form_data = request.form['Url']
-        audit_results = controller.collection_results(form_data.split("//")[1])
-        return render_template('display-collection.html', url = form_data, collection=audit_results)
+        return redirect("/dashboard")        
 
 @app.route('/project_details', methods = ['POST', 'GET'])
 def project_details():
@@ -111,7 +102,15 @@ def project_details():
         return render_template('display-collection.html', url = docs, collection=audit_results)
     if request.method == 'POST':
         form_data = request.form['Url']
-        audit_results = controller.collection_results(form_data)
+
+        if 'http' in form_data:
+          url = form_data.split("//")[1]
+        else:
+          url = form_data
+
+        clean_url = controller.remove_id_ref_and_trailing_slash(url)
+        base_url = clean_url.split("/")[0]
+        audit_results = controller.collection_results(base_url)
         return render_template('display-collection.html', url = form_data, collection=audit_results)
 
 @app.route('/details', methods = ['POST', 'GET'])
@@ -119,30 +118,23 @@ def details():
     if request.method == 'GET':
         url = request.args.get("page_url")
         audit_results = controller.get_result_for_url(url)
-        return render_template('display.html', url = url, images=audit_results['oversized_images'], links=audit_results, total_images=audit_results['image_count'])
+        return render_template('display.html', url = url, images=audit_results['images'], links=audit_results, total_images=audit_results['image_count'])
     if request.method == 'POST':
         form_data = request.form['Url']
-        task_id = 'test'
-        print(form_data)
-        audit_results = task_manager.get_result(task_id)
-        return render_template('display.html', url = form_data, images=audit_results['oversized_images'], links=audit_results, total_images=audit_results['image_count'])
 
-@app.route('/search', methods = ['POST', 'GET'])
-def search():
-    if request.method == 'GET':
-        return f"Use the '/' url to submit form"
-    if request.method == 'POST':
-        form_data = request.form['Url']
-        no_id_ref_url = form_data.split('#')
-        audit_results = controller.search_url(no_id_ref_url)
-        #audit_results = db[no_id_ref_url[0].split("//")[1]]
-        return render_template('display.html', url = form_data, images=audit_results['oversized_images'], links=audit_results, total_images=audit_results['image_count'])
+        if 'http' in form_data:
+          url = form_data.split("//")[1]
+        else:
+          url = form_data
+
+        clean_url = controller.remove_id_ref_and_trailing_slash(url)
+        audit_results=controller.get_result_for_url(clean_url)
+        return render_template('display.html',url=clean_url, images=audit_results['images'],links=audit_results, total_images=audit_results['image_count'])
         
 def sandbox():
     from replit import db
     from datetime import datetime
     print(task_manager.get_oldest_incomplete_task())
-
 
 if __name__ == '__main__':
     app.run("0.0.0.0")
