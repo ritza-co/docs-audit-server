@@ -3,6 +3,7 @@ from uuid import uuid4
 from datetime import datetime
 
 STATUS_SUBMITTED = "submitted"
+STATUS_RECRAWL = "recrawl"
 STATUS_PROCESSING = "processing"
 STATUS_DONE = "done"
 STATUS_FAILED = "failed"
@@ -29,6 +30,10 @@ def get_tasks():
     tasks = [dict(db['tasks'][task]) for task in db['tasks']]
     return tasks
 
+def get_incomplete_tasks():
+    incomplete_tasks = [dict(db['tasks'][task]) for task in db['tasks'] if db['tasks'][task]['status'] == STATUS_SUBMITTED]
+    return incomplete_tasks
+
 def create_task(task_type, input_data):
     task_id = str(uuid4())
     db['tasks'][task_id] = {
@@ -38,6 +43,14 @@ def create_task(task_type, input_data):
         "status": STATUS_SUBMITTED,
         "created_at": str(datetime.utcnow())
     }
+
+def recrawl_tasks(task_ids):
+    print(task_ids)
+    task_ids_list = task_ids.split(" // ")
+    for task_id in task_ids_list:
+      task = get_task(task_id)
+      task['status'] = STATUS_RECRAWL
+      db['tasks'][task_id] = task
 
 def update_task():
     #db['tasks']['001f2a5e-2635-46ec-9050-f00fb37c5635']['status'] = STATUS_DONE

@@ -62,14 +62,14 @@ def status():
 
 @app.route("/dashboard")
 def dashboard():
-    tasks = task_manager.get_tasks()
+    tasks = task_manager.get_incomplete_tasks()
     projects = controller.get_projects()
     print(tasks)
     return render_template("dashboard.html", tasks=tasks, projects=projects)
 
 @app.route("/dashboard-submit")
 def dashboard_submit():
-    tasks = task_manager.get_tasks()
+    tasks = task_manager.get_incomplete_tasks()
     projects = controller.get_projects()
     print(tasks)
     return render_template("dashboard.html", tasks=tasks, projects=projects, message="Data Submitted")
@@ -87,11 +87,9 @@ def recrawl():
     if request.method == 'GET':
         return f"Use the '/' url to submit form"
     if request.method == 'POST':
-        form_data = request.form['Url']
-        print(f"Running link audit for {form_data} ...")
-        print(form_data)
-        if not form_data.startswith("http"):
-            form_data = "https://" + form_data
+        task_ids = request.form['task_ids']
+        print(task_ids, 'umzekezeke')
+        task_manager.recrawl_tasks(task_ids)
         return redirect("/dashboard")        
 
 @app.route('/project_details', methods = ['POST', 'GET'])
@@ -118,7 +116,7 @@ def details():
     if request.method == 'GET':
         url = request.args.get("page_url")
         audit_results = controller.get_result_for_url(url)
-        return render_template('display.html', url = url, images=audit_results['images'], links=audit_results, total_images=audit_results['image_count'])
+        return render_template('display.html', url = url, images=audit_results['images'], links=audit_results, total_images=audit_results['image_count'], task_ids=audit_results['task_ids'])
     if request.method == 'POST':
         form_data = request.form['Url']
 
@@ -129,7 +127,7 @@ def details():
 
         clean_url = controller.remove_id_ref_and_trailing_slash(url)
         audit_results=controller.get_result_for_url(clean_url)
-        return render_template('display.html',url=clean_url, images=audit_results['images'],links=audit_results, total_images=audit_results['image_count'])
+        return render_template('display.html',url=clean_url, images=audit_results['images'],links=audit_results, total_images=audit_results['image_count'], task_ids=audit_results['task_ids'])
         
 def sandbox():
     from replit import db

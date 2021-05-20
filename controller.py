@@ -6,14 +6,20 @@ def separate_urls(form_input):
 
 def create_result_dict(task_results):
     audit_results = {}
+    task_ids = []
     for task_result in task_results:
       if task_result['task_type'] == 'link_audit':
         audit_results['total_links'] = task_result['output']['total_links']
         audit_results['broken_links'] = task_result['output']['all_links'][0]
         audit_results['working_links'] = task_result['output']['all_links'][1]
+        task_ids.append(task_result['task_id'])
       elif task_result['task_type'] == 'image_audit':
         audit_results['images'] = task_result['output']['oversize_images']
         audit_results['image_count'] = task_result['output']['image_count']
+        task_ids.append(task_result['task_id'])
+
+    audit_results['task_ids'] = task_ids[0] + " // " + task_ids[1]
+    print(audit_results['task_ids'])
     return audit_results
 
 def get_result_for_url(url):

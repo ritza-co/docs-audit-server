@@ -24,7 +24,7 @@
     <p>[{{ links['total_links'] }}] links (issues with {{links['broken_links']|length}}/{{ links['total_links'] }})</p>
 
     <form action="/recrawl" method="POST">
-      <input class="url_value" type="text" name="Url" value={{url}}/>
+      <input class="url_value" type="text" name="task_ids" value={{task_ids}}/>
       <input type="submit" value="Recrawl Page"/>
     </form>
 

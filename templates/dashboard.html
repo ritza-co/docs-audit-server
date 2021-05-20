@@ -23,6 +23,10 @@ th, td {
   padding: 8px;
 }
 
+.no_tasks_text{
+  text-align: center;
+}
+
 tr:nth-child(even) {background-color: #f2f2f2;}
 </style>
     <script src="{{ url_for('static', filename='sorttable.js') }}"></script>
@@ -48,6 +52,8 @@ tr:nth-child(even) {background-color: #f2f2f2;}
         <p></p>
         <p></p>
 
+        <h2>Pending Tasks</h2>
+        
         <table>
             <tr>
                 <th>Task ID</th>
@@ -70,8 +76,14 @@ tr:nth-child(even) {background-color: #f2f2f2;}
             {% endfor %}
         </table>
 
+        {% if tasks|length == 0 %}
+            <p class="no_tasks_text">Good news, all tasks have been completed!</p>
+        {% endif %}
+
         <p></p>
         <p></p>
+
+        <h2>Projects Summary</h2>
 
         <table class="sortable" id="dynamic_table">
             <thead><tr>
