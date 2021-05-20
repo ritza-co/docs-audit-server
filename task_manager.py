@@ -42,7 +42,7 @@ def create_task(task_type, input_data):
         "input_data": input_data,
         "status": STATUS_SUBMITTED,
         "created_at": str(datetime.utcnow())
-    }
+    } #comment
 
 def recrawl_tasks(task_ids):
     print(task_ids)
