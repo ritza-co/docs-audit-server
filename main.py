@@ -11,7 +11,7 @@ import task_manager
 import controller
 
 app = Flask(__name__)
-task_manager.initialise_db()
+task_manager.initialise_db() 
 
 @app.route("/")
 @app.route("/task", methods=["GET","POST"])
