@@ -18,7 +18,7 @@ def create_result_dict(task_results):
         audit_results['image_count'] = task_result['output']['image_count']
         task_ids.append(task_result['task_id'])
 
-    audit_results['task_ids'] = task_ids[0] + " // " + task_ids[1]
+    audit_results['task_ids'] = task_ids[0] + "//" + task_ids[1]
     print(audit_results['task_ids'])
     return audit_results
 

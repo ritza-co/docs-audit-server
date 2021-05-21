@@ -88,7 +88,7 @@ def recrawl():
         return f"Use the '/' url to submit form"
     if request.method == 'POST':
         task_ids = request.form['task_ids']
-        print(task_ids, 'umzekezeke')
+        print(task_ids, 'trailing slash weirdly added here')
         task_manager.recrawl_tasks(task_ids)
         return redirect("/dashboard")        
 
