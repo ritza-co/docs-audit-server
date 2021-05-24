@@ -33,8 +33,9 @@ def task_request():
         return jsonify(task_requests) 
     elif request.method == 'POST':
         worker_id = request.json["worker_id"]
+        requested_task_type = request.json.get("task_type")
         task_manager.create_task_request(worker_id)
-        task = task_manager.assign_task()
+        task = task_manager.assign_task(requested_task_type)
         return task
      
 @app.route("/result", methods=["GET", "POST"])
@@ -116,7 +117,10 @@ def details():
     if request.method == 'GET':
         url = request.args.get("page_url")
         audit_results = controller.get_result_for_url(url)
-        return render_template('display.html', url = url, images=audit_results['images'], links=audit_results, total_images=audit_results['image_count'], task_ids=audit_results['task_ids'])
+        print("_____")
+        print(audit_results['task_ids'])
+        print("***")
+        return render_template('display.html', url = url, images=audit_results['images'], results=audit_results, total_images=audit_results['image_count'], task_ids=audit_results['task_ids'])
     if request.method == 'POST':
         form_data = request.form['Url']
 

@@ -1,4 +1,46 @@
+
+
+
 # TODO
+
+## 21 May
+
+* Handle exceptions when requests.get throws an exception instead of getting an HTTP error code.
+
+
+
+Results page for a single link
+
+Link audit date <> 
+Image audit date <>
+
+[four tables, first two highighting issues, and next two showing all images and links.]
+
+LINK ISSUES 
+-----------
+| URL | CODE 
+
+IMAGE ISSUES
+------------
+| URL | SIZE
+
+ALL IMAGES
+-----------
+| URL | SIZE
+
+ALL LINKS
+------------
+| URL | CODE 
+
+* Modify the worker to also pass info about working links and images (every status code and every image size) back to the server
+
+* Remove the links from the tasks queue table IDs
+
+
+
+
+
+---
 
 * Move the front-ends from docs-audit to docs-server
 * Move the input logic from docs-audit to docs-server (user can submit URLs)

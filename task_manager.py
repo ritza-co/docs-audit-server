@@ -54,7 +54,7 @@ def create_task(task_type, input_data):
 
 def recrawl_tasks(task_ids):
     print(task_ids)
-    task_ids_list = task_ids[:-1].split("//")
+    task_ids_list = task_ids.split("//")
     print("task ids list is ", task_ids_list)
     for task_id in task_ids_list:
       print("looping ", task_id)
@@ -63,19 +63,26 @@ def recrawl_tasks(task_ids):
       db['tasks'][task_id] = task
 
 def update_task():
-    #db['tasks']['56fb40fb-c7ea-4810-a719-18d477b78ef4']['status'] = STATUS_DONE
+    #del db['tasks']['24d306cc-27b8-4bea-84ec-d15f85dffa91']
     print("Updated task")
 
 def handle_task_creation(input_list):
     for url in input_list:
         create_task("image_audit", url)
         create_task("link_audit", url)
+        #create_task("lighthouse", url)
 
-def get_oldest_incomplete_task():
+def get_oldest_incomplete_task(requested_task_type):
     tasks = db['tasks']
-    tasks_by_date = sorted(
-        [(tasks[task]['created_at'], tasks[task]['task_id']) for task in tasks if tasks[task]['status'] == STATUS_SUBMITTED]
-    )
+    if requested_task_type:
+        tasks_by_date = sorted(
+            [(tasks[task]['created_at'], tasks[task]['task_id']) for task in tasks if tasks[task]['status'] == STATUS_SUBMITTED and tasks[task]['task_type'] == requested_task_type]
+        )
+    else:
+        # don't give lighthouse tasks unless worker explicitly asks for them
+        tasks_by_date = sorted(
+            [(tasks[task]['created_at'], tasks[task]['task_id']) for task in tasks if tasks[task]['status'] == STATUS_SUBMITTED and tasks[task]['task_type'] != 'lighthouse']
+        )
     if tasks_by_date:
         task_id = tasks_by_date[0][1]
         return dict(tasks[task_id])
@@ -91,8 +98,8 @@ def get_oldest_recrawl_task():
         return dict(tasks[task_id])
     return None
 
-def assign_task():
-    task = get_oldest_incomplete_task()
+def assign_task(requested_task_type=None):
+    task = get_oldest_incomplete_task(requested_task_type)
     recrawl_task = {}
     if not task:
         recrawl_task = get_oldest_recrawl_task()

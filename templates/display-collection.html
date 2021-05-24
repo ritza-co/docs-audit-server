@@ -1,47 +1,73 @@
-<html>
-  <head>
-  <style>
-      table {
-        width: 100%;
-      }
-      table,
-      th,
-      td {
-        padding: 10px;
-        border: 1px solid black;
-        border-collapse: collapse;
-      }
-      .url_value {
-        display: none;
-      }
-      tr:nth-child(even) {background-color: #f2f2f2;}
-    </style>
-    <script src="{{ url_for('static', filename='sorttable.js') }}"></script>
-  </head>
-  <body>
-    <h2>Audit collection results for {{url}}</h2>
-    <a href="{{ url_for('dashboard') }}">Home</a>
-    <h3>{{collection|length}} pages were audited:</h3>
+{% extends 'base.html' %}
+{% block content %}
 
-    <table class="sortable" id="dynamic_table">
-      <thead><tr>
-      <th>Url</th>
-      <th>Images</th>
-      <th>Links</th>
-      <th>Image Issues</th>
-      <th>Link Issues</th>
-      </tr></thead>
-      <tbody>
-      {% for page in collection %}
-      <tr>
-        <td><a href="./details?page_url={{page}}">{{page}}</a></td>
-        <td>{{collection[page]['image_count']}}</td>
-        <td>{{collection[page]['total_links']}}</td>
-        <td>{{collection[page]['oversize_images']}}</td>
-        <td>{{collection[page]['broken_links']}}</td>
-      </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  </body>
-</html>
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
+        <div class="container px-5">
+            <a class="navbar-brand fw-bold" href="#page-top">Docs Audit</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+                    aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                Menu
+                <i class="bi-list"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto me-4 my-3 my-lg-0">
+                </ul>
+                <a class="btn btn-primary rounded-pill px-3 mb-2 mb-lg-0" href="{{ url_for('dashboard') }}">
+                    <span class="d-flex align-items-center">
+                        <i class="bi bi-house-fill me-2"></i>
+                        <span class="small">Home</span>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <section style="min-height: 100vh;">
+        <div class="container px-5 py-5">
+            <div class="mb-3">
+                <h5>Audit collection results for: <span class="link-primary">{{ url }}</span></h5>
+            </div>
+            <div class="bd-callout bd-callout-card py-2 px-3 my-5"><span >{{ collection|length }} page(s) were audited</span></div>
+
+            <table class="table table-borderless table-striped sortable" id="dynamic_table">
+                <thead>
+                <tr>
+                    <th>Url</th>
+                    <th>Images</th>
+                    <th>Links</th>
+                    <th>Image Issues</th>
+                    <th>Link Issues</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for page in collection %}
+                    <tr>
+                        <td><a href="./details?page_url={{ page }}">{{ page }}</a></td>
+                        <td>{{ collection[page]['image_count'] }}</td>
+                        <td>{{ collection[page]['total_links'] }}</td>
+                        <td>{{ collection[page]['oversize_images'] }}</td>
+                        <td>{{ collection[page]['broken_links'] }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <footer class="bg-black text-center py-5">
+        <div class="container px-5">
+            <div class="text-white-50 small">
+                <div class="mb-2">&copy; Ritza,
+                    <script>document.write(new Date().getFullYear())</script>
+
+                </div>
+            </div>
+        </div>
+    </footer>
+
+{% endblock %}
+
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='sorttable.js') }}"></script>
+{% endblock %}

@@ -1,55 +1,139 @@
-<html>
-  <style>
-    .url_value {
-        display: none;
-      }
-    .broken {
-      color: red;
-      display: inline;
-    }
-    .green {
-      color: green;
-      display: inline;
-    }
-  </style>
-  <body>
-    <h2>Audit for {{url}} complete</h2>
-    <a href="{{ url_for('dashboard') }}">Home</a>
-    {% if links['last_crawl'] is defined %}
-    <h3>Last crawl performed on {{ links['last_crawl'] }}</h3>
-    {% endif %}
-    <h3>We found:</h3>
-    <p>[{{ total_images }}] images (issues with {{images|length}}/{{total_images}})</p>
+{% extends 'base.html' %}
 
-    <p>[{{ links['total_links'] }}] links (issues with {{links['broken_links']|length}}/{{ links['total_links'] }})</p>
+{% block content %}
 
-    <form action="/recrawl" method="POST">
-      <input class="url_value" type="text" name="task_ids" value={{task_ids}}/>
-      <input type="submit" value="Recrawl Page"/>
-    </form>
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
+        <div class="container px-5">
+            <a class="navbar-brand fw-bold" href="#page-top">Docs Audit</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+                    aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                Menu
+                <i class="bi-list"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto me-4 my-3 my-lg-0">
+                    <li class="nav-item">
+                        <form action="/recrawl" method="POST">
+                            <input style="display: none;" type="text" name="task_ids" value={{ task_ids }}>
+                            <button type="submit" class="btn btn-outline-primary rounded-pill">
+                               <span class="d-flex align-items-center">
+                                    <i class="bi bi-bug-fill me-2"></i>
+                                    <span class="small">Recrawl Page</span>
+                                </span>
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+                <a class="btn btn-primary rounded-pill px-3 mb-2 mb-lg-0" href="{{ url_for('dashboard') }}">
+                    <span class="d-flex align-items-center">
+                        <i class="bi bi-house-fill me-2"></i>
+                        <span class="small">Home</span>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </nav>
 
-    <h3>Issues:</h3>
+    <section style="min-height: 100vh;">
+        <div class="container px-5 py-5">
+            <div class="mb-3">
+                <h5>Audit for <span class="link-primary">{{ url }}</span> complete</h5>
+            </div>
 
-    <ul>
-    {% for image in images %}
-    <li>Image <p class="broken">{{image['path']}}</p> was <p class="broken">{{image['size']}}</p> kb. We recommend <p class="green">100 KB</p> as the max size.</li>
-    {% endfor %}
-    </ul>
+            {% if results['last_crawl'] is defined %}
+                <div class=" pt-3 pb-4 px-3 "><span>Last crawl performed on {{ results['last_crawl'] }}</span></div>
+            {% endif %}
 
-    <ul>
-    {% for link in links['broken_links'] %}
-    <li><p class="broken">{{link['link']}}</p> returned code {{link['code']}}</li>
-    {% endfor %}
-    </ul>
+            <div class="my-5 row">
+                <div class=" col-6 justify-content-center">
+                    <div class=" bd-callout bd-callout-card py-3 px-4">
+                        <h3>Images</h3>
+                        <h2>{{ total_images }}</h2>
+                        <span>issues with {{ images|length }}/{{ total_images }}</span>
+                    </div>
+                </div>
 
-    {% if links['working_links'] is defined %}
-    <h3>The links below are working:</h3>
+                <div class=" col-6 ">
+                    <div class="  bd-callout bd-callout-card py-3 px-4 ml-4">
+                        <h3>Links</h3>
+                        <h2>{{ results['total_links'] }}</h2>
+                        <span>issues with {{ results['broken_links']|length }}/{{ results['total_links'] }}</span>
+                    </div>
+                </div>
+            </div>
 
-    <ul>
-    {% for link in links['working_links'] %}
-    <li>{{link}} </li>
-    {% endfor %}
-    </ul>
-    {% endif %}
-  </body>
-</html>
+            <div class="mt-4">
+
+                <ul class="nav nav-tabs" id="myTab" role="tablist" data-tabs="tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="issues-tab" data-toggle="tab" href="#issues" role="tab"
+                           aria-controls="issues" aria-selected="false">Issues</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="working-tab" data-toggle="tab" href="#working" role="tab"
+                           aria-controls="working" aria-selected="true">Working Links</a>
+                    </li>
+
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="issues" role="tabpanel" aria-labelledby="home-tab">
+                        <h3 class="my-4">Issues:</h3>
+
+                        <ul>
+                            {% for image in images %}
+                                <li>Image <p class="broken">{{ image['path'] }}</p> was <p
+                                        class="broken">{{ image['size'] }}</p> kb. We recommend <p class="green">100
+                                    KB</p> as the max size.
+                                </li>
+                            {% endfor %}
+                        </ul>
+
+                        <ul>
+                            {% for link in results['broken_links'] %}
+                                <li><p class="broken">{{ link['link'] }}</p> returned code {{ link['code'] }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="tab-pane fade" id="working" role="tabpanel" aria-labelledby="working-tab">
+
+                        {% if results['working_links'] is defined %}
+                            <h3 class="my-4">The links below are working:</h3>
+
+                            <ul>
+                                {% for link in results['working_links'] %}
+                                    <li>{{ link }} </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <footer class="bg-black text-center py-5">
+        <div class="container px-5">
+            <div class="text-white-50 small">
+                <div class="mb-2">&copy; Ritza,
+                    <script>document.write(new Date().getFullYear())</script>
+
+                </div>
+            </div>
+        </div>
+    </footer>
+
+{% endblock %}
+
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='sorttable.js') }}"></script>
+    <script type="text/javascript">
+        $('#myTab a').on('click', function (e) {
+            e.preventDefault()
+            $(this).tab('show')
+        })
+    </script>
+{% endblock %}

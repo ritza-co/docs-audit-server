@@ -4,6 +4,11 @@ def separate_urls(form_input):
     urls_list = form_input.split("\r\n")
     return urls_list
 
+def get_task_completion_time(task_id):
+    task = task_manager.get_task(task_id)
+    completion_time = task['completed_at']
+    return completion_time
+
 def create_result_dict(task_results):
     audit_results = {}
     task_ids = []
@@ -12,10 +17,12 @@ def create_result_dict(task_results):
         audit_results['total_links'] = task_result['output']['total_links']
         audit_results['broken_links'] = task_result['output']['all_links'][0]
         audit_results['working_links'] = task_result['output']['all_links'][1]
+        audit_results['link_audit_time'] = get_task_completion_time(task_result['task_id'])
         task_ids.append(task_result['task_id'])
       elif task_result['task_type'] == 'image_audit':
         audit_results['images'] = task_result['output']['oversize_images']
         audit_results['image_count'] = task_result['output']['image_count']
+        audit_results['image_audit_time'] = get_task_completion_time(task_result['task_id'])
         task_ids.append(task_result['task_id'])
 
     audit_results['task_ids'] = task_ids[0] + "//" + task_ids[1]
@@ -64,7 +71,12 @@ def calculate_project_sums(current_project_count, task_results):
       links_sum = current_project_count['links'] + task_results['output']['total_links']
       oversize_images_sum = current_project_count['oversize_images']
       broken_links_sum = current_project_count['broken_links'] + len(task_results['output']['all_links'][0])
-
+    else:
+      pages_sum = current_project_count['count']
+      images_sum = current_project_count['images']
+      links_sum = current_project_count['links']
+      oversize_images_sum = current_project_count['oversize_images']
+      broken_links_sum = current_project_count['broken_links']
     new_project_count = {'count': pages_sum,'images':images_sum,'links': links_sum,'oversize_images':oversize_images_sum,'broken_links':broken_links_sum}
 
     return new_project_count
@@ -87,15 +99,15 @@ def get_projects():
     return project_dictionaries
 
 def calculate_collection_sums(current_project_count, task_results):
+    links_sum = current_project_count['total_links']
+    broken_links_sum = current_project_count['broken_links']
+    images_sum = current_project_count['image_count']
+    oversize_images_sum = current_project_count['oversize_images']
     if task_results['task_type'] == 'image_audit':
       images_sum = task_results['output']['image_count']
-      links_sum = current_project_count['total_links']
       oversize_images_sum = len(task_results['output']['oversize_images'])
-      broken_links_sum = current_project_count['broken_links']
     elif task_results['task_type'] == 'link_audit':
-      images_sum = current_project_count['image_count']
       links_sum = task_results['output']['total_links']
-      oversize_images_sum = current_project_count['oversize_images']
       broken_links_sum = len(task_results['output']['all_links'][0])
 
     collection_count = {'total_links': links_sum,'broken_links': broken_links_sum, 'image_count': images_sum, 'oversize_images':oversize_images_sum}
