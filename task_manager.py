@@ -15,31 +15,44 @@ def initialise_db():
         db['task-requests'] = {}
     if 'results' not in db:
         db['results'] = {}
+    if 'work-queue' not in db:
+        db['work-queue'] = []
 
 def get_task(task_id):
     return dict(db['tasks'][task_id])
 
 def get_result(task_id):
-    return dict(db['results'][task_id])
-
-def get_results():
-    results = [dict(db['results'][result]) for result in db['results']]
+    print(f"getting result for {task_id}")
+    results = dict(db['results'][task_id])
     return results
 
+def get_results():
+    print("Getting results")
+    t1 = datetime.now()
+#     results = [dict(db['results'][result]) for result in db['results']]
+    results = dict(db['results'])
+    t2 = datetime.now()
+    print("calculation took", t2 - t1)
+    return results
+
+'''
 def get_tasks():
     tasks = [dict(db['tasks'][task]) for task in db['tasks']]
     return tasks
+'''
 
+'''
 def get_recrawl_tasks():
-    tasks_to_recrawl = [dict(db['tasks'][task]) for task in db['tasks'] if db['tasks'][task]['status'] == STATUS_RECRAWL]
+    # tasks_to_recrawl = [dict(db['tasks'][task]) for task in db['tasks'] if db['tasks'][task]['status'] == STATUS_RECRAWL]
+    tasks_to_recrawl = [db[task] for task in db['tasks'] if db['tasks'][task]['status'] == STATUS_SUBMITTED]
     return tasks_to_recrawl
+'''
 
 def get_incomplete_tasks():
-    incomplete_tasks = [dict(db['tasks'][task]) for task in db['tasks'] if db['tasks'][task]['status'] == STATUS_SUBMITTED]
-    tasks_to_recrawl = get_recrawl_tasks()
-
-    for task in tasks_to_recrawl:
-        incomplete_tasks.append(task)
+    # incomplete_tasks = [dict(db['tasks'][task]) for task in db['tasks'] if db['tasks'][task]['status'] == STATUS_SUBMITTED]
+    print("getting incopmlete tasks")
+    incomplete_tasks = [db[task] for task in db['tasks'] if db['tasks'][task]['status'] in ( STATUS_SUBMITTED, STATUS_RECRAWL)]
+    print("got, getting recrawl tasks")
     return incomplete_tasks
 
 def create_task(task_type, input_data):
@@ -70,18 +83,19 @@ def handle_task_creation(input_list):
     for url in input_list:
         create_task("image_audit", url)
         create_task("link_audit", url)
-        #create_task("lighthouse", url)
+        print("creating lighthouse task")
+        create_task("lighthouse", url)
 
 def get_oldest_incomplete_task(requested_task_type):
     tasks = db['tasks']
     if requested_task_type:
         tasks_by_date = sorted(
-            [(tasks[task]['created_at'], tasks[task]['task_id']) for task in tasks if tasks[task]['status'] == STATUS_SUBMITTED and tasks[task]['task_type'] == requested_task_type]
+            [(tasks[task]['created_at'], tasks[task]['task_id']) for task in tasks if tasks[task]['status'] in (STATUS_SUBMITTED, STATUS_RECRAWL) and tasks[task]['task_type'] == requested_task_type]
         )
     else:
         # don't give lighthouse tasks unless worker explicitly asks for them
         tasks_by_date = sorted(
-            [(tasks[task]['created_at'], tasks[task]['task_id']) for task in tasks if tasks[task]['status'] == STATUS_SUBMITTED and tasks[task]['task_type'] != 'lighthouse']
+            [(tasks[task]['created_at'], tasks[task]['task_id']) for task in tasks if tasks[task]['status'] in (STATUS_SUBMITTED, STATUS_RECRAWL) and tasks[task]['task_type'] != 'lighthouse']
         )
     if tasks_by_date:
         task_id = tasks_by_date[0][1]
@@ -100,21 +114,12 @@ def get_oldest_recrawl_task():
 
 def assign_task(requested_task_type=None):
     task = get_oldest_incomplete_task(requested_task_type)
-    recrawl_task = {}
-    if not task:
-        recrawl_task = get_oldest_recrawl_task()
-        if not recrawl_task:
-            return {}
     if task:
         task_id = task['task_id']
         db['tasks'][task_id]['status'] = STATUS_PROCESSING
         db['tasks'][task_id]['assigned_at'] = str(datetime.utcnow())
         return task
-    elif recrawl_task:
-        task_id = recrawl_task['task_id']
-        db['tasks'][task_id]['status'] = STATUS_PROCESSING
-        db['tasks'][task_id]['assigned_at'] = str(datetime.utcnow())
-        return recrawl_task
+    return {}
 
 def get_task_requests():
     return [dict(db['task-requests'][request]) for request in db['task-requests']]

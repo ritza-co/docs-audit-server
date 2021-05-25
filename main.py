@@ -65,7 +65,8 @@ def status():
 def dashboard():
     tasks = task_manager.get_incomplete_tasks()
     projects = controller.get_projects()
-    print(tasks)
+    # print(tasks)
+
     return render_template("dashboard.html", tasks=tasks, projects=projects)
 
 @app.route("/dashboard-submit")

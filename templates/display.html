@@ -50,6 +50,7 @@
                         <h3>Images</h3>
                         <h2>{{ total_images }}</h2>
                         <span>issues with {{ images|length }}/{{ total_images }}</span>
+                        <p>Image audit time: {{ results['image_audit_time']}}</p>
                     </div>
                 </div>
 
@@ -58,6 +59,7 @@
                         <h3>Links</h3>
                         <h2>{{ results['total_links'] }}</h2>
                         <span>issues with {{ results['broken_links']|length }}/{{ results['total_links'] }}</span>
+                        <p>Link audit time: {{ results['link_audit_time']}}</p>
                     </div>
                 </div>
             </div>
@@ -77,22 +79,91 @@
                 </ul>
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="issues" role="tabpanel" aria-labelledby="home-tab">
-                        <h3 class="my-4">Issues:</h3>
 
-                        <ul>
-                            {% for image in images %}
-                                <li>Image <p class="broken">{{ image['path'] }}</p> was <p
-                                        class="broken">{{ image['size'] }}</p> kb. We recommend <p class="green">100
-                                    KB</p> as the max size.
-                                </li>
-                            {% endfor %}
-                        </ul>
+                        {% if results['broken_links']|length > 0 %}
+                        <h3 class="my-4">Link Issues:</h3>
 
-                        <ul>
-                            {% for link in results['broken_links'] %}
-                                <li><p class="broken">{{ link['link'] }}</p> returned code {{ link['code'] }}</li>
-                            {% endfor %}
-                        </ul>
+                        <table class="table table-borderless table-striped sortable">
+                        <thead>
+                        <tr>
+                          <th>Url</th>
+                          <th>Code</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for link in results['broken_links'] %}
+                            <tr>
+                              <td>{{ link['link'] }}</td>
+                              <td>{{ link['code'] }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        </table>
+                        {% endif %}
+
+                        {% if images|length > 0 %}
+                        <h3 class="my-4">Image Issues:</h3>
+
+                        <table class="table table-borderless table-striped sortable">
+                        <thead>
+                        <tr>
+                          <th>Url</th>
+                          <th>Size (kb)</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for image in images %}
+                            <tr>
+                              <td>{{ image['path'] }}</td>
+                              <td>{{ image['size'] }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        </table>
+                        {% endif %}
+
+                        {% if results['working_links']|length > 0 %}
+                        <h3 class="my-4">Working Links:</h3>
+
+                        <table class="table table-borderless table-striped sortable">
+                        <thead>
+                        <tr>
+                          <th>Url</th>
+                          <th>Code</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for link in results['working_links'] %}
+                            <tr>
+                              <td>{{ link }}</td>
+                              <td>{{ 200 }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        </table>
+                        {% endif %}
+
+                      {% if results['right_size_images']|length > 0 %}
+                        <h3 class="my-4">Right Size Images:</h3>
+
+                        <table class="table table-borderless table-striped sortable">
+                        <thead>
+                        <tr>
+                          <th>Url</th>
+                          <th>Size (kb)</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for image in results['right_size_images'] %}
+                            <tr>
+                              <td>{{ image['path'] }}</td>
+                              <td>{{ image['size'] }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        </table>
+                        {% endif %}
+              
                     </div>
 
                     <div class="tab-pane fade" id="working" role="tabpanel" aria-labelledby="working-tab">

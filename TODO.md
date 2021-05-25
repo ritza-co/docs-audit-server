@@ -2,6 +2,14 @@
 
 
 # TODO
+## 25 May
+* LightHouse column - show performance, SEO, accessibility, and best practices per page and the worst performance number per collection
+* Combine num links and link issues so "Broken links" -> 11/700
+* Combine num images and image issues "Oversized images" -> 10/20.
+* "Num URLs" -> integer showing just the number of URLs in the collection
+* Remove task ID column from pending tasks
+
+
 
 ## 21 May
 

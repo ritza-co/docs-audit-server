@@ -21,6 +21,10 @@ def create_result_dict(task_results):
         task_ids.append(task_result['task_id'])
       elif task_result['task_type'] == 'image_audit':
         audit_results['images'] = task_result['output']['oversize_images']
+        try:
+          audit_results['right_size_images'] = task_result['output']['right_size_images']
+        except Exception as e:
+          print(e)
         audit_results['image_count'] = task_result['output']['image_count']
         audit_results['image_audit_time'] = get_task_completion_time(task_result['task_id'])
         task_ids.append(task_result['task_id'])
@@ -32,7 +36,8 @@ def create_result_dict(task_results):
 def get_result_for_url(url):
     url_task_results = []
     results = task_manager.get_results()
-    for result in results:
+    for r in results:
+      result = results[r]
       if result['task_url'].split("//")[1] == url:
         url_task_results.append(result)
     audit_results = create_result_dict(url_task_results)
@@ -59,6 +64,9 @@ def remove_id_ref_and_trailing_slash(url):
     return clean_url
 
 def calculate_project_sums(current_project_count, task_results):
+    print(current_project_count)
+    # print(task_results)
+    print("======")
     if task_results['task_type'] == 'image_audit':
       pages_sum = current_project_count['count'] + 0.5
       images_sum = current_project_count['images'] + task_results['output']['image_count']
@@ -82,9 +90,15 @@ def calculate_project_sums(current_project_count, task_results):
     return new_project_count
 
 def get_projects():
+    print("Getting projects")
+    print("...")
     results = task_manager.get_results()
+    print("got results")
     project_dictionaries = {}
-    for result in results:
+    for r in results:
+      print("looping results")
+      result = results[r]
+      print("==")
       url_list = result['task_url'].split("//")[1]
       doc_site_url = url_list.split("/")[0]
       if doc_site_url not in project_dictionaries:
@@ -93,6 +107,7 @@ def get_projects():
         elif result['task_type'] == 'link_audit':
           project_dictionaries[doc_site_url] = {'count': 0.5, 'images': 0, 'links': result['output']['total_links'], 'oversize_images': 0, 'broken_links': len(result['output']['all_links'][0])}
       else:
+        print("calculating sums")
         new_sums = calculate_project_sums(project_dictionaries[doc_site_url],result)
         project_dictionaries[doc_site_url] = new_sums
 
@@ -118,7 +133,8 @@ def collection_results(url):
     collection_dictionaries = {}
     results = task_manager.get_results()
 
-    for result in results:
+    for r in results:
+      result = results[r]
       url_list = result['task_url'].split("//")[1]
       doc_site_url = url_list.split("/")[0]
       if doc_site_url == url:
