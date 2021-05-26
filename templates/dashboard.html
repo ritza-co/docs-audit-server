@@ -154,7 +154,6 @@
 
                 <table class="table table-borderless table-striped">
                     <tr>
-                        <th>Task ID</th>
                         <th>Task Type</th>
                         <th>Input Data</th>
                         <th>Status</th>
@@ -164,12 +163,11 @@
 
                     {% for task in tasks %}
                         <tr>
-                            <td><a href="./result?task_id={{ task.task_id }}">{{ task.task_id }}</a></td>
                             <td>{{ task.task_type }}</td>
                             <td>{{ task.input_data }}</td>
                             <td>{{ task.status }}</td>
                             <td>{{ task.created_at }}</td>
-                            <td>{{ task.assigned_at }}
+                            <td>{{ task.assigned_at }}</td>
                         </tr>
                     {% endfor %}
                 </table>
@@ -205,21 +203,23 @@
                     <tr>
                         <th>Docs</th>
                         <th>Urls Audited</th>
-                        <th>Images</th>
-                        <th>Links</th>
                         <th>Image Issues</th>
                         <th>Link Issues</th>
+                        <th>Worst Performing Page (%)</th>
                     </tr>
                     </thead>
                     <tbody>
                     {% for docs in projects %}
                         <tr>
                             <td><a href="./project_details?docs_base_url={{ docs }}">{{ docs }}</a></td>
-                            <td>{{ projects[docs]['count'] }}</td>
-                            <td>{{ projects[docs]['images'] }}</td>
-                            <td>{{ projects[docs]['links'] }}</td>
-                            <td>{{ projects[docs]['oversize_images'] }}</td>
-                            <td>{{ projects[docs]['broken_links'] }}</td>
+                            <td>{{ projects[docs]['count']|int }}</td>
+                            <td>{{ projects[docs]['oversize_images'] }}/{{ projects[docs]['images'] }}</td>
+                            <td>{{ projects[docs]['broken_links'] }}/{{ projects[docs]['links'] }}</td>
+                            {% if projects[docs]['worst_performance'] == 101 %}
+                              <td>-</td>
+                            {% else %}
+                              <td>{{ projects[docs]['worst_performance']|int }}</td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                     </tbody>

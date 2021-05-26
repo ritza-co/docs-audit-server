@@ -73,19 +73,26 @@ def calculate_project_sums(current_project_count, task_results):
       links_sum = current_project_count['links']
       oversize_images_sum = current_project_count['oversize_images'] + len(task_results['output']['oversize_images'])
       broken_links_sum = current_project_count['broken_links']
+      worst_performance = current_project_count['worst_performance']
     elif task_results['task_type'] == 'link_audit':
       pages_sum = current_project_count['count'] + 0.5
       images_sum = current_project_count['images']
       links_sum = current_project_count['links'] + task_results['output']['total_links']
       oversize_images_sum = current_project_count['oversize_images']
       broken_links_sum = current_project_count['broken_links'] + len(task_results['output']['all_links'][0])
-    else:
+      worst_performance = current_project_count['worst_performance']
+    elif task_results['task_type'] == 'lighthouse':
       pages_sum = current_project_count['count']
       images_sum = current_project_count['images']
       links_sum = current_project_count['links']
       oversize_images_sum = current_project_count['oversize_images']
       broken_links_sum = current_project_count['broken_links']
-    new_project_count = {'count': pages_sum,'images':images_sum,'links': links_sum,'oversize_images':oversize_images_sum,'broken_links':broken_links_sum}
+      if float(task_results['output']['performance']) < current_project_count['worst_performance']:
+        worst_performance = float(task_results['output']['performance'])*100
+      else:
+        worst_performance = current_project_count['worst_performance']
+  
+    new_project_count = {'count': pages_sum,'images':images_sum,'links': links_sum,'oversize_images':oversize_images_sum,'broken_links':broken_links_sum,'worst_performance':worst_performance}
 
     return new_project_count
 
@@ -103,9 +110,11 @@ def get_projects():
       doc_site_url = url_list.split("/")[0]
       if doc_site_url not in project_dictionaries:
         if result['task_type'] == 'image_audit':
-          project_dictionaries[doc_site_url] = {'count': 0.5, 'images': result['output']['image_count'], 'links': 0, 'oversize_images': len(result['output']['oversize_images']), 'broken_links': 0}
+          project_dictionaries[doc_site_url] = {'count': 0.5, 'images': result['output']['image_count'], 'links': 0, 'oversize_images': len(result['output']['oversize_images']), 'broken_links': 0, 'worst_performance': 101}
         elif result['task_type'] == 'link_audit':
-          project_dictionaries[doc_site_url] = {'count': 0.5, 'images': 0, 'links': result['output']['total_links'], 'oversize_images': 0, 'broken_links': len(result['output']['all_links'][0])}
+          project_dictionaries[doc_site_url] = {'count': 0.5, 'images': 0, 'links': result['output']['total_links'], 'oversize_images': 0, 'broken_links': len(result['output']['all_links'][0]), 'worst_performance': 101}
+        elif result['task_type'] == 'lighthouse':
+          project_dictionaries[doc_site_url] = {'count': 0, 'images': 0, 'links': 0, 'oversize_images': 0, 'broken_links': 0, 'worst_performance': float(result['output']['performance'])*100}
       else:
         print("calculating sums")
         new_sums = calculate_project_sums(project_dictionaries[doc_site_url],result)
@@ -118,14 +127,17 @@ def calculate_collection_sums(current_project_count, task_results):
     broken_links_sum = current_project_count['broken_links']
     images_sum = current_project_count['image_count']
     oversize_images_sum = current_project_count['oversize_images']
+    performance = current_project_count['performance']
     if task_results['task_type'] == 'image_audit':
       images_sum = task_results['output']['image_count']
       oversize_images_sum = len(task_results['output']['oversize_images'])
     elif task_results['task_type'] == 'link_audit':
       links_sum = task_results['output']['total_links']
       broken_links_sum = len(task_results['output']['all_links'][0])
+    elif task_results['task_type'] == 'lighthouse':
+      performance = float(task_results['output']['performance'])*100
 
-    collection_count = {'total_links': links_sum,'broken_links': broken_links_sum, 'image_count': images_sum, 'oversize_images':oversize_images_sum}
+    collection_count = {'total_links': links_sum,'broken_links': broken_links_sum, 'image_count': images_sum, 'oversize_images':oversize_images_sum, 'performance': performance}
 
     return collection_count
 
@@ -140,9 +152,11 @@ def collection_results(url):
       if doc_site_url == url:
         if url_list not in collection_dictionaries:
           if result['task_type'] == 'image_audit':
-            collection_dictionaries[url_list] = {'total_links': 0, 'broken_links': 0, 'image_count': result['output']['image_count'], 'oversize_images': len(result['output']['oversize_images'])}
+            collection_dictionaries[url_list] = {'total_links': 0, 'broken_links': 0, 'image_count': result['output']['image_count'], 'oversize_images': len(result['output']['oversize_images']), 'performance': 0}
           elif result['task_type'] == 'link_audit':
-            collection_dictionaries[url_list] = {'total_links': result['output']['total_links'], 'broken_links': len(result['output']['all_links'][0]), 'image_count': 0, 'oversize_images': 0}
+            collection_dictionaries[url_list] = {'total_links': result['output']['total_links'], 'broken_links': len(result['output']['all_links'][0]), 'image_count': 0, 'oversize_images': 0, 'performance': 0}
+          elif result['task_type'] == 'lighthouse':
+            collection_dictionaries[url_list] = {'total_links': 0, 'broken_links': 0, 'image_count': 0, 'oversize_images': 0, 'performance': float(result['output']['performance'])*100}
         else:
           new_sum = calculate_collection_sums(collection_dictionaries[url_list],result)
           collection_dictionaries[url_list] = new_sum

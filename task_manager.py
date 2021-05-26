@@ -15,8 +15,8 @@ def initialise_db():
         db['task-requests'] = {}
     if 'results' not in db:
         db['results'] = {}
-    if 'work-queue' not in db:
-        db['work-queue'] = []
+    if 'queued-tasks' not in db:
+        db['queued-tasks'] = {}
 
 def get_task(task_id):
     return dict(db['tasks'][task_id])
@@ -49,21 +49,27 @@ def get_recrawl_tasks():
 '''
 
 def get_incomplete_tasks():
+    # return dict(db['queued-tasks'])
+    return [dict(db['queued-tasks'][task]) for task in db['queued-tasks']]
+    '''
     # incomplete_tasks = [dict(db['tasks'][task]) for task in db['tasks'] if db['tasks'][task]['status'] == STATUS_SUBMITTED]
     print("getting incopmlete tasks")
     incomplete_tasks = [db[task] for task in db['tasks'] if db['tasks'][task]['status'] in ( STATUS_SUBMITTED, STATUS_RECRAWL)]
     print("got, getting recrawl tasks")
     return incomplete_tasks
+    '''
 
 def create_task(task_type, input_data):
     task_id = str(uuid4())
-    db['tasks'][task_id] = {
+    task = {
         "task_id": task_id,
         "task_type": task_type,
         "input_data": input_data,
         "status": STATUS_SUBMITTED,
         "created_at": str(datetime.utcnow())
-    } #comment
+    }
+    db['tasks'][task_id] = task
+    db['queued-tasks'][task_id] = task
 
 def recrawl_tasks(task_ids):
     print(task_ids)
@@ -118,6 +124,7 @@ def assign_task(requested_task_type=None):
         task_id = task['task_id']
         db['tasks'][task_id]['status'] = STATUS_PROCESSING
         db['tasks'][task_id]['assigned_at'] = str(datetime.utcnow())
+        db['queued-tasks'][task_id] = task
         return task
     return {}
 
@@ -141,6 +148,7 @@ def create_result(worker_id, task_id, task_type, task_url, output):
         "worker_id": worker_id,
         "output": output
     }
-
+    if task_id in db['queued-tasks']:
+        del db['queued-tasks'][task_id]
     db['tasks'][task_id]['status'] = STATUS_DONE
     db['tasks'][task_id]['completed_at'] = str(datetime.now())

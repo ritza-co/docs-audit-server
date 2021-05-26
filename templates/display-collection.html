@@ -33,20 +33,22 @@
                 <thead>
                 <tr>
                     <th>Url</th>
-                    <th>Images</th>
-                    <th>Links</th>
                     <th>Image Issues</th>
                     <th>Link Issues</th>
+                    <th>Performance (%)</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for page in collection %}
                     <tr>
                         <td><a href="./details?page_url={{ page }}">{{ page }}</a></td>
-                        <td>{{ collection[page]['image_count'] }}</td>
-                        <td>{{ collection[page]['total_links'] }}</td>
-                        <td>{{ collection[page]['oversize_images'] }}</td>
-                        <td>{{ collection[page]['broken_links'] }}</td>
+                        <td>{{ collection[page]['oversize_images'] }}/{{ collection[page]['image_count'] }}</td>
+                        <td>{{ collection[page]['broken_links'] }}/{{ collection[page]['total_links'] }}</td>
+                        {% if collection[page]['performance'] == 0 %}
+                          <td>-</td>
+                        {% else %}
+                            <td>{{ collection[page]['performance']|int }}</td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
                 </tbody>

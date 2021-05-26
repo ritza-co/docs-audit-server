@@ -69,16 +69,28 @@
                 <ul class="nav nav-tabs" id="myTab" role="tablist" data-tabs="tabs">
                     <li class="nav-item">
                         <a class="nav-link active" id="issues-tab" data-toggle="tab" href="#issues" role="tab"
-                           aria-controls="issues" aria-selected="false">Issues</a>
+                           aria-controls="issues" aria-selected="false">Link Issues</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" id="working-tab" data-toggle="tab" href="#working" role="tab"
                            aria-controls="working" aria-selected="true">Working Links</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="imageissues-tab" data-toggle="tab" href="#imageissues" role="tab"
+                           aria-controls="imageissues" aria-selected="true">Image Issues</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="imageokay-tab" data-toggle="tab" href="#imageokay" role="tab"
+                           aria-controls="imageokay" aria-selected="true">Right Size Images</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="overview-tab" data-toggle="tab" href="#overview" role="tab"
+                           aria-controls="overview" aria-selected="true">Lighthouse Overview</a>
+                    </li>
 
                 </ul>
                 <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show active" id="issues" role="tabpanel" aria-labelledby="home-tab">
+                    <div class="tab-pane fade show active" id="issues" role="tabpanel" aria-labelledby="issues-tab">
 
                         {% if results['broken_links']|length > 0 %}
                         <h3 class="my-4">Link Issues:</h3>
@@ -101,26 +113,9 @@
                         </table>
                         {% endif %}
 
-                        {% if images|length > 0 %}
-                        <h3 class="my-4">Image Issues:</h3>
+                    </div>
 
-                        <table class="table table-borderless table-striped sortable">
-                        <thead>
-                        <tr>
-                          <th>Url</th>
-                          <th>Size (kb)</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for image in images %}
-                            <tr>
-                              <td>{{ image['path'] }}</td>
-                              <td>{{ image['size'] }}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                        </table>
-                        {% endif %}
+                    <div class="tab-pane fade" id="working" role="tabpanel" aria-labelledby="working-tab">
 
                         {% if results['working_links']|length > 0 %}
                         <h3 class="my-4">Working Links:</h3>
@@ -143,7 +138,44 @@
                         </table>
                         {% endif %}
 
-                      {% if results['right_size_images']|length > 0 %}
+                        <!-- {% if results['working_links'] is defined %}
+                            <h3 class="my-4">The links below are working:</h3>
+
+                            <ul>
+                                {% for link in results['working_links'] %}
+                                    <li>{{ link }} </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %} -->
+                    </div>
+
+                    <div class="tab-pane fade" id="imageissues" role="tabpanel" aria-labelledby="imageissues-tab">
+                        {% if images|length > 0 %}
+                        <h3 class="my-4">Image Issues:</h3>
+
+                        <table class="table table-borderless table-striped sortable">
+                        <thead>
+                        <tr>
+                          <th>Url</th>
+                          <th>Size (kb)</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for image in images %}
+                            <tr>
+                              <td>{{ image['path'] }}</td>
+                              <td>{{ image['size'] }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        </table>
+                        {% endif %}
+
+                    </div>
+
+                    <div class="tab-pane fade" id="imageokay" role="tabpanel" aria-labelledby="imageokay-tab">
+                       
+                        {% if results['right_size_images']|length > 0 %}
                         <h3 class="my-4">Right Size Images:</h3>
 
                         <table class="table table-borderless table-striped sortable">
@@ -163,21 +195,13 @@
                         </tbody>
                         </table>
                         {% endif %}
-              
                     </div>
 
-                    <div class="tab-pane fade" id="working" role="tabpanel" aria-labelledby="working-tab">
-
-                        {% if results['working_links'] is defined %}
-                            <h3 class="my-4">The links below are working:</h3>
-
-                            <ul>
-                                {% for link in results['working_links'] %}
-                                    <li>{{ link }} </li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
+                    <div class="tab-pane fade" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                       
+                        
                     </div>
+
                 </div>
             </div>
 
