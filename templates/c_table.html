@@ -1,0 +1,87 @@
+<!-- {% if collection %}
+        <section id="projects" >
+            <div class="container px-5 pt-4">
+                <h1 class="display-5 lh-1 mb-5 text-center">Project Summary</h1>
+
+                <div class="mb-4 d-flex flex-wrap border-top border-bottom py-1 justify-content-around">
+                <div class=" py-2 px-3 ms-3">
+                  <b>Audited Page(s):</b>
+                  <span class="text-muted ms-1">{{ collection|length }}</span>
+                </div>
+                </div>
+
+                <table class="table table-borderless table-striped sortable" id="dynamic_table">
+                <thead>
+                <tr>
+                    <th>Url</th>
+                    <th class="text-center">Image Issues</th>
+                    <th class="text-center">Link Issues</th>
+                    <th class="text-center">Performance (%)</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for page in collection %}
+                    <tr>
+                        <td><a href="/details?page_url={{ page }}">{{ page }}</a></td>
+                        <td class="text-center" sorttable_customkey={{ collection[page]['oversize_images'] }}>{{ collection[page]['oversize_images'] }}/{{ collection[page]['image_count'] }}</td>
+                        <td class="text-center" sorttable_customkey={{ collection[page]['broken_links'] }}>{{ collection[page]['broken_links'] }}/{{ collection[page]['total_links'] }}</td>
+                        {% if collection[page]['performance'] == 0 %}
+                          <td class="text-center">-</td>
+                        {% else %}
+                            <td class="text-center">{{ collection[page]['performance']|int }}</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            </div>
+        </section>
+    {% endif %} -->
+
+
+    <!-- {% if collection %}
+        <section  >
+            <div class="container px-5">
+                <h1 class="display-5 lh-1 mb-5 text-center">Projects Summary</h1>
+
+                <table class="sortable table table-borderless table-striped" id="dynamic_table">
+                    <thead>
+                    <tr>
+                        <th>Docs</th>
+                        <th class="text-center">Urls Audited</th>
+                        <th class="text-center">Image Issues</th>
+                        <th class="text-center">Link Issues</th>
+                        <th class="text-center">Worst Performing Page (%)</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for docs in collection %}
+                        <tr id="{{loop.index}}">
+                            <td><a href="./project_details?docs_base_url={{ docs }}">{{ docs }}</a></td>
+                            <td class="text-center">{{ collection[docs]['count']|int }}</td>
+                            <td class="text-center" sorttable_customkey="{{collection[docs]['oversize_images']}}">{{ collection[docs]['oversize_images'] }}/{{ collection[docs]['images'] }}</td>
+                            <td class="text-center" sorttable_customkey="{{collection[docs]['broken_links'] }}">{{ collection[docs]['broken_links'] }}/{{ collection[docs]['links'] }}</td>
+                            {% if collection[docs]['worst_performance'] == 101 %}
+                              <td class="text-center">-</td>
+                            {% else %}
+                              <td class="text-center">{{ collection[docs]['worst_performance']|int }}</td>
+                            {% endif %}
+                            <td>
+                              <button data-docid="{{ docs }}" class="btn" data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal">
+                                    <span class="d-flex align-items-center text-danger">
+                                        <i class="bi-trash"></i>
+                                        <span class="small"></span>
+                                    </span>
+                            </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </section>
+    {% endif %} -->

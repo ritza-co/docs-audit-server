@@ -1,17 +1,17 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 {% block content %}
 
-<nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
-	<div class="container px-5">
-		<a class="navbar-brand fw-bold" href="#page-top">Docs Audit</a>
-		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
+        <div class="container px-5">
+            <a class="navbar-brand fw-bold" href="./dashboard">Docs Audit</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
                     aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 Menu
                 <i class="bi-list"></i>
             </button>
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ms-auto me-4 my-3 my-lg-0">
-                     <li class="nav-item d-none" id="tosummary"><a class="nav-link me-lg-3" href="#projects">Projects Summary</a></li>
+                     <li class="nav-item"><a class="nav-link me-lg-3" href="#projects">Projects Summary</a></li>
                       <li class="nav-item"><button class="btn btn-primary rounded-pill px-3 mb-2 mb-lg-0" data-bs-toggle="modal"
                         data-bs-target="#feedbackModal">
                         <span class="d-flex align-items-center">
@@ -30,20 +30,23 @@
                 <div class="col-lg-6">
                     <div class="mb-5 mb-lg-0 text-center text-lg-start">
 
-                        <h1 class="display-1 lh-1 mb-4">Smart <span class="text-primary">Docs</span> audit platform</h1>
+                        <h1 class="display-1 lh-1 mb-4">Smart docs audit platform</h1>
 
-                        <p class="lead fw-normal text-muted ">Submit a new task for auditing. </p>
+                        <p class="lead fw-normal text-muted ">Submit new task for auditing. </p>
 
                         <form method="POST" action="/dashboard" id="createTask">
                             <div class="input-group my-4">
-
+                              <!-- <input type="text" 
+                              class="form-control py-3" 
+                              name="input_data" 
+                              placeholder="https://docs.example.com/getting-started" > -->
                               {{ form.csrf_token }}
                               {{ form.url(class='form-control py-3') }}
                              
                               <div class="input submit">
-                                 <button type="submit" id="submitbtn" class="btn btn-outline-primary  px-3 py-3 lead ">
+                                 <button type="submit" class="btn btn-outline-primary  px-3 py-3 lead ">
                                    <span class="d-flex align-items-center">
-                                        <i class="bi bi-app-indicator me-2"></i>
+                                        <i class="bi bi-back me-2"></i>
                                         <span class="small">Submit</span>
                                     </span>
                                 </button>
@@ -51,29 +54,13 @@
                             </div>
                         </form>
 
-
-                        <div class=" my-4 d-flex center-mod d-none alert alert-success " role="alert" id="msg">
-                            <div class="spinner-border" role="status">
-                              <span class="sr-only"></span>
+                        {% if message %}
+                            <div class="alert alert-primary my-4" role="alert">
+                                <span style="color: red;">{{ message }}</span>
                             </div>
+                        {% endif %}
 
-                            <span class="ms-4 me-4">Audit in progress, you can close the window <br /> Check back later at <span class="text-primary">
-                              <!-- {{url_for('dashboard')}}  -->
-                              https://docs-audit.ritza.co
-                              </span> </span>
-                        </div>
-
-                        <div class="my-4 p-2 d-none alert alert-danger" role="alert" id="errormsg"></div>
-
-
-                        <div class="pt-3">
-                            <blockquote class="quote-card">
-                              <p class="lead fw-normal text-center ">
-                                An intuitive solution to broken documentation links, performance
-                                and image size optimisation, wrapped in a single app!
-                              </p>
-                            </blockquote>
-                        </div>
+                        <!-- <div class="mt-3 pt-2 d-none" id="msg"></div> -->
 
                     </div>
                 </div>
@@ -155,7 +142,7 @@
             </div>
         </div>
 
-        <!-- {% if tasks %}
+        {% if tasks %}
             <div class="container px-5 mt-5">
 
                 <h2 class="mb-3">{{ tasks|length }} Pending Tasks</h2>
@@ -165,16 +152,74 @@
                 {% endif %}
 
             </div>
-        {% endif %} -->
+        {% endif %}
     </header>
 
-    <section id="projects" class="d-one" ></section>
+    <!-- <section > -->
+        <div class="container px-5 pt-3">
+            <blockquote class="quote-card">
+              <p class="lead fw-normal text-muted text-center ">
+                An intuitive solution to broken documentation links, typos
+                and image size optimisation, wrapped up in a single app!
+              </p>
+            </blockquote>
+        </div>
+    <!-- </section> -->
+    
+
+    {% if projects %}
+        <section id="projects" >
+            <div class="container px-5">
+                <h1 class="display-5 lh-1 mb-5 text-center">Projects Summary</h1>
+
+                <table class="sortable table table-borderless table-striped" id="dynamic_table">
+                    <thead>
+                    <tr>
+                        <th>Docs</th>
+                        <th class="text-center">Urls Audited</th>
+                        <th class="text-center">Image Issues</th>
+                        <th class="text-center">Link Issues</th>
+                        <th class="text-center">Worst Performing Page (%)</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for docs in projects %}
+                        <tr id="{{loop.index}}">
+                            <td><a href="./project_details?docs_base_url={{ docs }}">{{ docs }}</a></td>
+                            <td class="text-center">{{ projects[docs]['count']|int }}</td>
+                            <td class="text-center" sorttable_customkey="{{projects[docs]['oversize_images']}}">{{ projects[docs]['oversize_images'] }}/{{ projects[docs]['images'] }}</td>
+                            <td class="text-center" sorttable_customkey="{{projects[docs]['broken_links'] }}">{{ projects[docs]['broken_links'] }}/{{ projects[docs]['links'] }}</td>
+                            {% if projects[docs]['worst_performance'] == 101 %}
+                              <td class="text-center">-</td>
+                            {% else %}
+                              <td class="text-center">{{ projects[docs]['worst_performance']|int }}</td>
+                            {% endif %}
+                            <td>
+                              <button data-docid="{{ docs }}" class="btn" data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal">
+                                    <span class="d-flex align-items-center text-danger">
+                                        <i class="bi-trash"></i>
+                                        <span class="small"></span>
+                                    </span>
+                            </button>
+                            </td>
+                            <!-- <td><a href="./delete-project?project_base_url={{ docs }}"><span class="text-danger"><i class="bi bi-trash me-2" title="Delete"></i></span></a></td> -->
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </section>
+    {% endif %}
 
     <footer class="bg-black text-center py-5">
         <div class="container px-5">
             <div class="text-white-50 small">
                 <div class="mb-2">&copy; Ritza,
                     <script>document.write(new Date().getFullYear())</script>
+
                 </div>
             </div>
         </div>
@@ -202,7 +247,9 @@
                 <div class="modal-body border-0 p-4">
                   <p class="py-3">Are you sure you want to delete <span id="docname" class="text-primary"></span></p>
 
-                  <button onClick="deleteProject()" id="deleteBtn" class="btn btn-outline-danger"><i class="bi bi-trash me-2" title="Delete"></i> Delete</button>
+                  <!-- <a href="./delete-project?project_base_url={{ docs }}"><span class="btn btn-outline-danger"><i class="bi bi-trash me-2" title="Delete"></i> Delete</span></a> -->
+
+                  <a href="javascript:deleteProject()"><span class="btn btn-outline-danger"><i class="bi bi-trash me-2" title="Delete"></i> Delete</span></a>
 
                   <a  data-bs-dismiss="modal"
                             aria-label="Close">
@@ -212,14 +259,14 @@
             </div>
         </div>
     </div>
+
+
 {% endblock %}
 
 
 {% block scripts %}
-    
-    <script type="text/javascript">
-    let interval = null;
-    
+    <script src="{{ url_for('static', filename='sorttable.js') }}"></script>
+    <script>
     if ( window.history.replaceState ) {
       window.history.replaceState( null, null, window.location.href );
     }
@@ -230,215 +277,39 @@
     })
 
     function deleteProject() {
-      $('#deleteBtn') .html(`
-          <div class="spinner-border" role="status">
-            <span class="sr-only"></span>
-          </div>
-      `)
-      $('#deleteBtn').prop('disabled', true);
       $.ajax({
-        url: '/reset-project',
+        url: '/delete-project',
         type: 'DELETE',
         data: JSON.stringify({ project_base_url: $("#docname").text() }),
         contentType: 'application/json; charset=utf-8',
         success: function(response) {
             $('#deleteModal').modal('toggle');
-            $('#msg').addClass('d-none');
-           // $('#projects').addClass('d-none');
-            $('#deleteBtn').prop('disabled', false);
-            $('#deleteBtn') .html(`
-              <span class="d-flex align-items-center">
-                  <i class="bi bi-trash me-2"></i>
-                  <span class="small">Delete</span>
-              </span>
-           `)
-           getUserProjects();
+            window.location.href = response['url']
         },
         error: function(error) {
           console.log('error')
-          $('#deleteBtn').prop('disabled', false);
-          $('#deleteBtn') .html(`
-            <span class="d-flex align-items-center">
-                <i class="bi bi-trash me-2"></i>
-                <span class="small">Delete</span>
-            </span>
-            `
-          )
         }
       }).done( function(){
       })
     }
 
-    function getUserProjects (){
-      // $.ajax({
-      //   url: '/progress',
-      //   type: 'GET',
-      //   contentType: 'application/json; charset=utf-8',
-      //   success: function(response) {
-      //       if (response['progress'] > 0) {
-      //               console.log('progress' + response['progress'])
-      //           }
-      //           console.log('doing something')
-      //   },
-      //   error: function(error) {
-      //     console.log('error')
-      //   }
-      // }).done( function(){
-      // })
-      $.ajax({
-        url: '/myprojects',
-        type: 'GET',
-        contentType: 'application/json; charset=utf-8',
-        success: function(response) {
-            let numProjects = Object.keys(response).length
-
-            let projectsHTML = `
-              <div class="container px-5 pt-4">
-                <h1 class="display-5 lh-1 mb-5 text-center">Projects Summary</h1>
-                <div class="mb-4 d-flex flex-wrap border-top border-bottom py-1 justify-content-around">
-                <div class=" py-2 px-3 ms-3">
-                  <b>Audited Projects(s):</b>
-                  <span class="text-muted ms-1">${numProjects}</span>
-                </div>
-                </div>
-                <table class="table table-borderless table-striped sortable" id="dynamic_table">
-                <thead>
-                <tr>
-                    <th>Url</th>
-                    <th class="text-center">Urls Audited</th>
-                    <th class="text-center">Image Issues</th>
-                    <th class="text-center">Link Issues</th>
-                    <th class="text-center">Performance (%)</th>
-                </tr>
-                </thead>
-                <tbody>
-            `
-            $.each(response, function(key, page){
-                let perf = page.worst_performance === 0 || page.worst_performance > 100 ? '-' : parseInt(page.worst_performance);
-
-                let endpoint = '/project_details?docs_base_url'
-                projectsHTML += `
-                  <tr>
-                      <td><a href="${endpoint}=${key}">${key}</a></td>
-                      <td class="text-center" sorttable_customkey="${page.count}">${page.count}</td>
-                      <td class="text-center" sorttable_customkey="${page.oversize_images}">${page.oversize_images}/${page.images}</td>
-                      <td class="text-center" sorttable_customkey="${page.broken_links}">${page.broken_links}/${page.links}</td>                      
-                      <td class="text-center">${perf}</td>
-                      <td>                              
-                        <button data-docid="${key}" class="btn" data-bs-toggle="modal"
-                              data-bs-target="#deleteModal">
-                              <span class="d-flex align-items-center text-danger">
-                                  <i class="bi-trash"></i>
-                                  <span class="small"></span>
-                              </span>
-                        </button>
-                        
-                      </td>                       
-                  </tr>
-                `
-            });
-
-            projectsHTML += `
-                  </tbody>
-            </table>
-            </div>
-            `
-            $('#projects').html(projectsHTML);
-            forEach(document.getElementsByTagName('table'), function(table) {
-              if (table.className.search(/\bsortable\b/) != -1) {
-                sorttable.makeSortable(table);
-              }
-            });
-
-            if (numProjects > 0){
-              if(interval !== null){
-                clearInterval(interval);
-              }
-              interval = 0; 
-              $('#msg').addClass('d-none');
-              $('#projects').removeClass('d-none');
-              $('#tosummary').removeClass('d-none')
-            } else {
-              $('#projects').addClass('d-none');
-              $('#tosummary').addClass('d-none')
-            }
-        
-        },
-        error: function(error) {
-          console.log('error')
-          $('#projects').addClass('d-none');
-          $('#tosummary').addClass('d-none');
-          $('#msg').addClass('d-none');
-        }
-      }).done( function(){
-
-      })
-    }
-
-
-    getUserProjects();
-
-
-    $('#createTask').on('submit', function () {
-        event.preventDefault();
-        $('#submitbtn') .html(`
-          <div class="spinner-border" role="status">
-            <span class="sr-only"></span>
-          </div>
-        `)
-        $('#submitbtn').prop('disabled', true);
-        $.ajax({
-            url: '/submittask',
-            data: $('form').serialize(),
-            type: 'POST',
-            success: function (response) {
-              if(response['previouslyAudited'] === 'yes')  {
-                //window.location.href = 'https://docs-audit.ritza.co/details?page_url=' + response['pageUrl']
-                window.location.href = response['pageUrl']
-              }  
-              if(response['formValid']=== 'yes' && response['previouslyAudited'] === 'no') {
-                  $('#msg').removeClass('d-none')
-                  $('#submitbtn').prop('disabled', false);
-                  $('#submitbtn') .html(`
-                    <span class="d-flex align-items-center">
-                        <i class="bi bi-app-indicator me-2"></i>
-                        <span class="small">Submit</span>
-                    </span>
-                  `)
-                  
-                  interval = setInterval(function() {
-                      getUserProjects();
-                  }, 60000)
-              }  
-              if(response['formValid'] === 'no'){
-                 $('#errormsg').html(`
-                   <span>URL submitted is not valid</span>
-                 `)
-                 $('#errormsg').removeClass('d-none')
-                 setTimeout(function(){ $('#errormsg').addClass('d-none') }, 2000)
-                 $('#submitbtn').prop('disabled', false);
-                  $('#submitbtn') .html(`
-                    <span class="d-flex align-items-center">
-                        <i class="bi bi-app-indicator me-2"></i>
-                        <span class="small">Submit</span>
-                    </span>
-                  `)
-              }              
-            },
-            error: function (error) {
-                console.log(error);
-                $('#submitbtn').prop('disabled', false);
-                $('#submitbtn') .html( `
-                  <span class="d-flex align-items-center">
-                      <i class="bi bi-app-indicator me-2"></i>
-                      <span class="small">Submit</span>
-                  </span>
-                  ` )
-            }
-        }).done(function () {   
-        });
-    });
-
+    // $('#createTask').on('submit', function () {
+    //     event.preventDefault();
+    //     $.ajax({
+    //         url: '/dashboard',
+    //         data: $('form').serialize(),
+    //         type: 'POST',
+    //         success: function (response) {         
+    //           $('#msg').removeClass('d-none').html(`<p class="p-3 ${response['class']} " >${response['msg']}</p>`)
+    //           setTimeout(() => { $('#msg').addClass('d-none') }, 3000 )             
+    //         },
+    //         error: function (error) {
+    //             console.log(error);
+    //         }
+    //     }).done(function () {
+    
+    //     });
+    // });
     </script>
   
 {% endblock %}

@@ -1,11 +1,24 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block style %}
+<style>
+	.chart {
+		position: relative;
+		width: 50px;
+		height: 50px;
+	}
 
-{% block content %}
+	canvas {
+		display: block;
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
+</style>
+{% endblock %} {% block content %}
 
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
-        <div class="container px-5">
-            <a class="navbar-brand fw-bold" href="#page-top">Docs Audit</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+<nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
+	<div class="container px-5">
+		<a class="navbar-brand fw-bold" href="{{ url_for('dashboard') }}">Docs Audit</a>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
                     aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 Menu
                 <i class="bi-list"></i>
@@ -36,65 +49,128 @@
 
     <section style="min-height: 100vh;">
         <div class="container px-5 py-5">
-            <div class="mb-3">
-                <h5>Audit for <span class="link-primary">{{ url }}</span> complete</h5>
+
+            <h1 class="display-6 lh-1 mb-4 text-center">Audit Completion Summary</h1>
+
+            {% if message %}
+              <p>{{ message }}</p>
+            {% endif %}
+
+            <div class="mb-4 d-flex flex-wrap border-top border-bottom py-1 justify-content-around">
+                <div class="py-2 px-3 d-flex center-mod">
+                  <!-- <b>Page: </b> -->
+                  <span style="font-size: 1.8rem"><i class="bi bi-file-earmark-medical"></i></span>
+                  <span class="text-muted ms-2">{{ url }}</span>
+                </div>
+                 {% if results['link_audit_time'] is defined %}
+                <div class=" py-2 px-3 ms-3 d-flex center-mod">
+                  <span style="font-size: 1.8rem"><i class="bi bi-calendar2-check-fill"></i></span>
+                  <!-- <b>Audit time:</b> -->
+                  <span class="text-muted ms-2 badge-mod">{{ results['link_audit_time']}}</span>
+                </div>
+                {% endif %}
             </div>
 
             {% if results['last_crawl'] is defined %}
                 <div class=" pt-3 pb-4 px-3 "><span>Last crawl performed on {{ results['last_crawl'] }}</span></div>
             {% endif %}
 
-            <div class="my-5 row">
-                <div class=" col-6 justify-content-center">
-                    <div class=" bd-callout bd-callout-card py-3 px-4">
-                        <h3>Images</h3>
-                        <h2>{{ total_images }}</h2>
-                        <span>issues with {{ images|length }}/{{ total_images }}</span>
-                        <p>Image audit time: {{ results['image_audit_time']}}</p>
+            <div class="my-4 row">
+                <div class="col-6 d-flex justify-content-center">
+                    <div class=" py-3 px-4">
+                        <h3>
+                           <i class="bi bi-images me-3"></i>
+                          Images                      
+                        {% if total_images %}
+                          <span class="display-6 text-primary px-2">{{ total_images }}</span>
+                        {% else %}
+                          <span class="display-6 text-primary px-2">0</span>
+                        {% endif %}
+                        </h3>
+                        <!-- {% if total_images %}
+                          <h2>{{ total_images }}</h2>
+                        {% else %}
+                          <h2>0</h2>
+                        {% endif %} -->
+                        <div id="image-issues-go" class="d-flex justify-content-center">
+                        {% if results['total_image_issues'] %}
+                        <a data-toggle="tab" href="#imageissues">
+                          <i class="bi bi-box-arrow-in-down-right me-2"></i>
+                          <span class="text-muted" >Issues <b class="badge bg-danger ms-2">{{ results['total_image_issues'] }}</b></span>
+                        </a>
+                        {% else %}
+                        <a data-toggle="tab" href="#imageissues">
+                          <i class="bi bi-box-arrow-in-down-right me-2"></i>
+                          <span class="text-muted" >Issues <b class="badge bg-danger ms-2">{{ images|length }}</b></span>                          
+                        </a>
+                        {% endif %}
+                        </div>
                     </div>
                 </div>
 
-                <div class=" col-6 ">
-                    <div class="  bd-callout bd-callout-card py-3 px-4 ml-4">
-                        <h3>Links</h3>
-                        <h2>{{ results['total_links'] }}</h2>
-                        <span>issues with {{ results['broken_links']|length }}/{{ results['total_links'] }}</span>
-                        <p>Link audit time: {{ results['link_audit_time']}}</p>
+                <div class="col-6 d-flex justify-content-center">
+                    <div class=" py-3 px-4 ml-4">
+                        <h3>
+                          <i class="bi bi-link-45deg me-3"></i>
+                          Links                       
+                        {% if results['total_links'] %}
+                          <span class="display-6 text-primary px-2">{{ results['total_links'] }}</span>
+                        {% else %}
+                          <span class="display-6 text-primary px-2">0</span>
+                        {% endif %}
+                        </h3>
+
+                        <div id="link-issues-go" class="d-flex justify-content-center">
+                        {% if results['total_link_issues'] %}
+                        <a data-toggle="tab" href="#issues">
+                          <i class="bi bi-box-arrow-in-down-right me-2"></i>
+                          <span class="text-muted">Issues <b class="badge bg-danger ms-2">{{ results['total_link_issues'] }}</b></span>
+                        </a>
+                        {% else %}
+                        <a data-toggle="tab" href="#issues">
+                          <i class="bi bi-box-arrow-in-down-right me-2"></i>
+                          <span class="text-muted">Issues <b class="badge bg-danger ms-2">{{ results['broken_links']|length }}</b></span>
+                        </a>
+                        {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-4">
+            <div class="py-3">             
+               {% if results['lighthouse'] %}
+                <div class="row">
+                 {% for lighthouse in results['lighthouse'] %}
+                  <div class="col-lg-3">
+                    <div class="d-flex center-mod" >
+                     <b>{{ lighthouse['category'] }}</b>      
+                      <div class="piechart chart d-flex ms-3 center-mod"  data-percent="{{ lighthouse['score']|int }}"></div>                
+                     </div>
+                  </div>                       
+                  {% endfor %}             
+                </div>
+              {% endif %}
+            </div>
+           
 
+            <div class="mt-4 c_breadcrumb" id="summary-tables">
                 <ul class="nav nav-tabs" id="myTab" role="tablist" data-tabs="tabs">
                     <li class="nav-item">
                         <a class="nav-link active" id="issues-tab" data-toggle="tab" href="#issues" role="tab"
-                           aria-controls="issues" aria-selected="false">Link Issues</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="working-tab" data-toggle="tab" href="#working" role="tab"
-                           aria-controls="working" aria-selected="true">Working Links</a>
+                           aria-controls="issues" aria-selected="false">Links</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" id="imageissues-tab" data-toggle="tab" href="#imageissues" role="tab"
-                           aria-controls="imageissues" aria-selected="true">Image Issues</a>
+                           aria-controls="imageissues" aria-selected="true">Images</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="imageokay-tab" data-toggle="tab" href="#imageokay" role="tab"
-                           aria-controls="imageokay" aria-selected="true">Right Size Images</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="overview-tab" data-toggle="tab" href="#overview" role="tab"
-                           aria-controls="overview" aria-selected="true">Lighthouse Overview</a>
-                    </li>
-
                 </ul>
-                <div class="tab-content" id="myTabContent">
+                <div class="tab-content p-5" id="myTabContent">
                     <div class="tab-pane fade show active" id="issues" role="tabpanel" aria-labelledby="issues-tab">
 
                         {% if results['broken_links']|length > 0 %}
-                        <h3 class="my-4">Link Issues:</h3>
-
+                        <h3 class="mt-4 mb-1">
+                          <i class="bi bi-link-45deg me-3 text-danger"></i>
+                          Broken Links</h3>
                         <table class="table table-borderless table-striped sortable">
                         <thead>
                         <tr>
@@ -105,21 +181,25 @@
                         <tbody>
                         {% for link in results['broken_links'] %}
                             <tr>
-                              <td>{{ link['link'] }}</td>
-                              <td>{{ link['code'] }}</td>
+                              <td>
+                                <div >
+                                {{ link['link'] }} 
+                                <a href="{{link['link']}}">
+                                  <i class="bi bi-box-arrow-up-right ms-2" title="Open"></i>
+                                </a>
+                                </div>                                
+                              </td>
+                              <td class="text-danger">{{ link['code'] }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
                         </table>
                         {% endif %}
 
-                    </div>
-
-                    <div class="tab-pane fade" id="working" role="tabpanel" aria-labelledby="working-tab">
-
-                        {% if results['working_links']|length > 0 %}
-                        <h3 class="my-4">Working Links:</h3>
-
+                        {% if results['broken_status_codes']|length > 0 %}
+                        <h3 class="mt-4 mb-1"> 
+                          <i class="bi bi-link-45deg me-3 text-danger"></i>
+                          Non-Successful Status Codes</h3>
                         <table class="table table-borderless table-striped sortable">
                         <thead>
                         <tr>
@@ -128,83 +208,164 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for link in results['working_links'] %}
+                        {% for link in results['broken_status_codes'] %}
                             <tr>
-                              <td>{{ link }}</td>
-                              <td>{{ 200 }}</td>
+                              <td>
+                                <div >
+                                {{ link['link'] }} 
+                                <a href="{{link['link']}}" target="_blank">
+                                  <i class="bi bi-box-arrow-up-right ms-2" title="Open"></i>
+                                <!-- <svg xmlns='http://www.w3.org/2000/svg' class="ms-1" width="20" height="20" viewBox='0 0 512 512'><title>Open</title><path d='M384 224v184a40 40 0 01-40 40H104a40 40 0 01-40-40V168a40 40 0 0140-40h167.48M336 64h112v112M224 288L440 72' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='40'/></svg> -->
+                                </a>
+                                </div>
+                                </td>
+                              <td class="text-danger">{{ link['code'] }}</td>
+                              <!-- <td><a href="{{link['link']}}">Visit Link</a></td> -->
                             </tr>
                         {% endfor %}
                         </tbody>
                         </table>
                         {% endif %}
 
-                        <!-- {% if results['working_links'] is defined %}
-                            <h3 class="my-4">The links below are working:</h3>
-
-                            <ul>
-                                {% for link in results['working_links'] %}
-                                    <li>{{ link }} </li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %} -->
-                    </div>
-
-                    <div class="tab-pane fade" id="imageissues" role="tabpanel" aria-labelledby="imageissues-tab">
-                        {% if images|length > 0 %}
-                        <h3 class="my-4">Image Issues:</h3>
-
+                        {% if results['working_links']|length > 0 %}
+                        <h3 class="mt-4 mb-1">
+                          <i class="bi bi-link-45deg me-3 text-success"></i>
+                          Working Links</h3>
                         <table class="table table-borderless table-striped sortable">
                         <thead>
                         <tr>
                           <th>Url</th>
-                          <th>Size (kb)</th>
+                          <th>Code</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% if results['working_links'] %}
+                          {% for link in results['working_links'] %}
+                            <tr>
+                              <td>
+                                <div >
+                                <a href="./view-or-audit?page_url={{ link['link'] }}__{{url}}">{{ link['link'] }}</a>
+                                <a href="{{link['link']}}" target="_blank">
+                                  <i class="bi bi-box-arrow-up-right ms-2" title="Open"></i>
+                                </a>
+                                </div>
+
+                              </td>
+                              <td class="text-success">{{ link['code'] }}</td>
+                              <!-- <td>
+                                <a href="./audit_page?page_url={{ link['link'] }}"> <i class="bi bi-bug-fill me-2" title="Audit Page"></i></a>
+                                </td> -->
+                              <td>
+                                <div class="spinner-border d-none" role="status" id="l{{loop.index}}">
+                                  <span class="sr-only"></span>
+                                </div>
+                                <a href="javascript:auditPage( '{{ link['link'] }}','{{loop.index}}' )" id="r{{loop.index}}"> <i class="bi bi-bug-fill me-2" title="Audit Page"></i></a>
+                                <!-- <i class="bi bi-check2-circle d-none" id="d{{loop.index}}"></i> -->
+                                <span class="d-none" id="d{{loop.index}}">Auditing</span>
+                              </td>
+                            </tr>
+                          {% endfor %}
+                        {% endif %}
+                        </tbody>
+                        </table>
+                        {% endif %}
+
+                    </div>
+
+                    <div class="tab-pane fade" id="imageissues" role="tabpanel" aria-labelledby="imageissues-tab">
+
+                      {% if results['broken_images']|length > 0 %}
+                      <h3 class="mt-4 mb-1"><i class="bi bi-images me-3 text-danger"></i>Broken Images:</h3>
+                      <table class="table table-borderless table-striped sortable">
+                        <thead>
+                        <tr>
+                          <th>Url</th>
+                          <th class="text-center">Status Code</th>
+                          <th class="text-center">Size (kb)</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for image in results['broken_images'] %}
+                            <tr>
+                              <td>{{ image['path'] }}</td>
+                              <td class="text-danger text-center">{{ image['code'] }}</td>
+                              <td class="text-danger text-center">{{ image['size'] }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        </table>
+                      {% endif %}
+
+                      {% if results['image_broken_status_codes']|length > 0 %}
+                      <h3 class="mt-4 mb-1"><i class="bi bi-images me-3 text-danger"></i>Non-Successful Status Codes:</h3>
+                      <table class="table table-borderless table-striped sortable">
+                        <thead>
+                        <tr>
+                          <th>Url</th>
+                          <th class="text-center">Status Code</th>
+                          <th class="text-center">Size (kb)</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for image in results['image_broken_status_codes'] %}
+                            <tr>
+                              <td>{{ image['path'] }}</td>
+                              <td class="text-center">{{ image['code'] }}</td>
+                              <td class="text-center">{{ image['size'] }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        </table>
+                      {% endif %} 
+
+                        {% if images|length > 0 %}
+                        <h3 class="mt-4 mb-1"><i class="bi bi-images me-3 text-danger"></i>Oversize Images: <span class="ms-3 text-muted" style="font-size: 1rem; font-weight: 500;">* recommended optimal size <span class="text-success">100kb</span> or less</span></h3>
+                        
+                        <table class="table table-borderless table-striped sortable">
+                        <thead>
+                        <tr>
+                          <th>Url</th>
+                          <th class="text-center">Status Code</th>
+                          <th class="text-center">Size (kb)</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for image in images %}
                             <tr>
                               <td>{{ image['path'] }}</td>
-                              <td>{{ image['size'] }}</td>
+                              <td class="text-danger text-center">{{ image['code'] }}</td>
+                              <td class="text-danger text-center">{{ image['size'] }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
                         </table>
                         {% endif %}
 
-                    </div>
-
-                    <div class="tab-pane fade" id="imageokay" role="tabpanel" aria-labelledby="imageokay-tab">
-                       
                         {% if results['right_size_images']|length > 0 %}
-                        <h3 class="my-4">Right Size Images:</h3>
-
+                        <h3 class="mt-4 mb-1"><i class="bi bi-images me-3 text-success"></i>Right Size Images:</h3>
                         <table class="table table-borderless table-striped sortable">
                         <thead>
                         <tr>
                           <th>Url</th>
-                          <th>Size (kb)</th>
+                          <th class="text-center">Status Code</th>
+                          <th class="text-center">Size (kb)</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for image in results['right_size_images'] %}
                             <tr>
                               <td>{{ image['path'] }}</td>
-                              <td>{{ image['size'] }}</td>
+                              <td class="text-success text-center">{{ image['code'] }}</td>
+                              <td class="text-success text-center">{{ image['size'] }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
                         </table>
                         {% endif %}
-                    </div>
 
-                    <div class="tab-pane fade" id="overview" role="tabpanel" aria-labelledby="overview-tab">
-                       
-                        
                     </div>
-
                 </div>
             </div>
-
         </div>
     </section>
 
@@ -214,7 +375,6 @@
             <div class="text-white-50 small">
                 <div class="mb-2">&copy; Ritza,
                     <script>document.write(new Date().getFullYear())</script>
-
                 </div>
             </div>
         </div>
@@ -224,11 +384,102 @@
 
 
 {% block scripts %}
-    <script src="{{ url_for('static', filename='sorttable.js') }}"></script>
     <script type="text/javascript">
         $('#myTab a').on('click', function (e) {
             e.preventDefault()
             $(this).tab('show')
         })
+
+        $('#image-issues-go a').on('click', function (e) {
+          e.preventDefault()
+          $('#myTab a[href="#imageissues"]').tab('show')
+          $('html, body').animate({
+                    scrollTop: $("#summary-tables").offset().top - 100
+                }, 800);
+        })
+
+        $('#link-issues-go a').on('click', function (e) {
+          e.preventDefault()
+          $('#myTab a[href="#issues"]').tab('show')
+          $('html, body').animate({
+                    scrollTop: $("#summary-tables").offset().top - 100
+                }, 800);
+        })
+
+        function auditPage( url, id){
+            $("#r"+id).addClass('d-none');
+            $("#l"+id).removeClass('d-none');
+            $.ajax({
+              url: '/audit_page',
+              type: 'POST',
+              data: JSON.stringify(url),
+              contentType: 'application/json; charset=utf-8',
+              success: function(response) {
+                  $("#r"+id).addClass('d-none');
+                  $("#l"+id).addClass('d-none');
+                  $("#d"+id).removeClass('d-none');
+              },
+              error: function(error) {
+                 $("#r"+id).removeClass('d-none');
+                 $("#l"+id).addClass('d-none');
+                 $("#d"+id).addClass('d-none');
+                 console.log('error')
+              }
+            }).done( function(){
+            })
+        }
+    </script>
+    
+    <script type="text/javascript">
+    const charts = document.getElementsByClassName('piechart')
+    var chartDivs = Array.prototype.filter.call(charts, function(el){
+
+        var options = {
+            percent:  el.getAttribute('data-percent') || 25,
+            size: el.getAttribute('data-size') || 50,
+            lineWidth: el.getAttribute('data-line') || 5,
+            rotate: el.getAttribute('data-rotate') || 0
+        }
+
+        var canvas = document.createElement('canvas');
+        var span = document.createElement('span');
+        span.textContent = options.percent;
+
+        if (typeof(G_vmlCanvasManager) !== 'undefined') {
+            G_vmlCanvasManager.initElement(canvas);
+        }
+
+        var ctx = canvas.getContext('2d');
+        canvas.width = canvas.height = options.size;
+
+        el.appendChild(span);
+        el.appendChild(canvas);
+
+        ctx.translate(options.size / 2, options.size / 2);
+        ctx.rotate((-1 / 2 + options.rotate / 180) * Math.PI);
+
+        var radius = (options.size - options.lineWidth) / 2;
+
+        var drawCircle = function(color, lineWidth, percent) {
+                percent = Math.min(Math.max(0, percent || 1), 1);
+                ctx.beginPath();
+                ctx.arc(0, 0, radius, 0, Math.PI * 2 * percent, false);
+                ctx.strokeStyle = color;
+                ctx.lineCap = 'round'; 
+                ctx.lineWidth = lineWidth
+                ctx.stroke();
+        };
+
+        var color = '#e53935'
+        if(options.percent >= 50 && options.percent <= 89){
+          color = '#fb8c00'
+        }
+        if(options.percent >= 90 && options.percent <= 100){
+          color = '#18b663'
+        }
+
+        drawCircle('#efefef', options.lineWidth, 100 / 100);
+        drawCircle(color, options.lineWidth, options.percent / 100);
+    })
     </script>
 {% endblock %}

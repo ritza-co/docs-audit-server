@@ -1,10 +1,9 @@
-{% extends 'base.html' %}
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
-        <div class="container px-5">
-            <a class="navbar-brand fw-bold" href="#page-top">Docs Audit</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+<nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
+	<div class="container px-5">
+		<a class="navbar-brand fw-bold" href="{{ url_for('dashboard') }}">Docs Audit</a>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
                     aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 Menu
                 <i class="bi-list"></i>
@@ -22,32 +21,39 @@
         </div>
     </nav>
 
-    <section style="min-height: 100vh;">
+    <section style="min-height: 90vh;">
         <div class="container px-5 py-5">
-            <div class="mb-3">
-                <h5>Audit collection results for: <span class="link-primary">{{ url }}</span></h5>
+          <h1 class="display-6 lh-1 mb-4 text-center">Audit Collection Results</h1>
+            <div class="mb-4 d-flex flex-wrap border-top border-bottom py-1 justify-content-around">
+              <div class="py-2 px-3 d-flex center-mod">
+                  <span style="font-size: 1.8rem"><i class="bi bi-file-earmark-medical"></i></span>
+                  <span class="text-muted ms-2">{{ url }}</span>
+                </div>
+                <div class=" py-2 px-3 ms-3 d-flex center-mod">
+                  <b>Audited Page(s):</b>
+                  <span class="text-muted ms-1">{{ collection|length }}</span>
+                </div>
             </div>
-            <div class="bd-callout bd-callout-card py-2 px-3 my-5"><span >{{ collection|length }} page(s) were audited</span></div>
 
             <table class="table table-borderless table-striped sortable" id="dynamic_table">
                 <thead>
                 <tr>
                     <th>Url</th>
-                    <th>Image Issues</th>
-                    <th>Link Issues</th>
-                    <th>Performance (%)</th>
+                    <th class="text-center">Image Issues</th>
+                    <th class="text-center">Link Issues</th>
+                    <th class="text-center">Performance (%)</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for page in collection %}
                     <tr>
                         <td><a href="./details?page_url={{ page }}">{{ page }}</a></td>
-                        <td>{{ collection[page]['oversize_images'] }}/{{ collection[page]['image_count'] }}</td>
-                        <td>{{ collection[page]['broken_links'] }}/{{ collection[page]['total_links'] }}</td>
+                        <td class="text-center" sorttable_customkey={{ collection[page]['oversize_images'] }}>{{ collection[page]['oversize_images'] }}/{{ collection[page]['image_count'] }}</td>
+                        <td class="text-center" sorttable_customkey={{ collection[page]['broken_links'] }}>{{ collection[page]['broken_links'] }}/{{ collection[page]['total_links'] }}</td>
                         {% if collection[page]['performance'] == 0 %}
-                          <td>-</td>
+                          <td class="text-center">-</td>
                         {% else %}
-                            <td>{{ collection[page]['performance']|int }}</td>
+                            <td class="text-center">{{ collection[page]['performance']|int }}</td>
                         {% endif %}
                     </tr>
                 {% endfor %}
@@ -61,15 +67,9 @@
             <div class="text-white-50 small">
                 <div class="mb-2">&copy; Ritza,
                     <script>document.write(new Date().getFullYear())</script>
-
                 </div>
             </div>
         </div>
     </footer>
 
-{% endblock %}
-
-
-{% block scripts %}
-    <script src="{{ url_for('static', filename='sorttable.js') }}"></script>
 {% endblock %}

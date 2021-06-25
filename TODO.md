@@ -1,14 +1,30 @@
-
-
-
 # TODO
+
+## 28 May
+
+* 
+* Worker should be able to handle broken images ('couldn't fetch image') - if requests.get throws an error
+* Worker should also report image HTTP codes - 404, 301, 200, etc and we should have another column in images that shows this
+* We should combine tabs to have 
+
+- Links tab
+- - shows broken links at the top (coudln't fetch), followed by non-successful status codes, followed by OK status codes
+
+- Images tab
+- - shows broken images at the top (couldn't fetch) followed by non-successful status codes, followed by large images (above 100 KB, highlighted somehow), followed by all other images.
+
+- Lighthouse tab
+- Tatenda: remove this and put the data above as part of the overall summary.
+
+
+* Rethink the routes so that the homepage redirects to dashboard and data is posted back to the /dashboard route too.
+
 ## 25 May
 * LightHouse column - show performance, SEO, accessibility, and best practices per page and the worst performance number per collection
 * Combine num links and link issues so "Broken links" -> 11/700
 * Combine num images and image issues "Oversized images" -> 10/20.
 * "Num URLs" -> integer showing just the number of URLs in the collection
 * Remove task ID column from pending tasks
-
 
 
 ## 21 May

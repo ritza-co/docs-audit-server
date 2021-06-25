@@ -4124,7 +4124,7 @@ textarea.form-control-lg {
 .nav-link {
     display: block;
     padding: 0.5rem 1rem;
-    color: #2937f0;
+    color: #a6a6a6;
     text-decoration: none;
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
 }
@@ -11819,7 +11819,7 @@ New styles
 
 .bd-callout-card {
     background-color: #ffffff;
-    border-left-color: #f0ad4e !important;
+    border-left-color: #e6e6e4 !important;
 }
 
 .broken {
@@ -11830,4 +11830,109 @@ New styles
 .green {
     color: green;
     display: inline;
+}
+
+.quote-card {
+  /* background: #fff; */
+  color: #222222;
+  padding: 20px;
+  padding-left: 6rem;
+  box-sizing: border-box;
+  /* box-shadow: 0 2px 4px rgba(34, 34, 34, 0.12); */
+  position: relative;
+  overflow: hidden;
+  min-height: 120px;
+}
+.quote-card p {
+  font-size: 18px;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 80%;
+}
+.quote-card cite {
+  font-size: 16px;
+  margin-top: 10px;
+  display: block;
+  font-weight: 200;
+  opacity: 0.8;
+}
+.quote-card:before {
+  font-family: Georgia, serif;
+  content: "“";
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 5em;
+  color: rgb(41, 55, 240);
+  font-weight: normal;
+}
+.quote-card:after {
+  font-family: Georgia, serif;
+  content: "”";
+  position: absolute;
+  bottom: -50px;
+  line-height: 80px;
+  right: 0;
+  font-size: 7em;
+  color: rgb(41, 55, 240);
+  font-weight: normal;
+}
+
+#projects{
+  padding-top: 1rem !important;
+}
+
+.badge-mod {
+  font-size: 0.88em;
+  border-radius: 10rem;
+}
+
+.center-mod {
+  align-items: center; 
+  justify-content: center;
+}
+
+
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+color: #fff;
+background-color: #393939;
+}
+
+.nav-tabs > li > a{padding:10px 30px}
+.nav-tabs > li.active {
+  border-bottom:3px solid blue;
+}
+
+
+.c_breadcrumb {
+  padding: 1px;
+  background: #f1f1f5;
+  padding-right: 15px;
+}
+
+.c_breadcrumb li {
+  display: inline-block;
+  min-width:50px;
+  background: white;
+  text-decoration: none;
+  -webkit-clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%);
+  clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%);
+  padding: 0;
+  position: relative;
+  margin-right: -13px;
+}
+
+.c_breadcrumb li#last {
+  -webkit-clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 50%, calc(100% - 0px) 100%, 0 100%, 15px 50%);
+  clip-path: polygon(0 0, calc(100% - 0px) 0, 100% 50%, calc(100% - 0px) 100%, 0 100%, 15px 50%);
+}
+
+.c_breadcrumb li:hover {
+  color: white;
+  background: #fff;
+}
+
+.c_breadcrumb li:first-child {
+  -webkit-clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%);
+  clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%);
 }
